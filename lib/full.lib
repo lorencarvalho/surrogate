@@ -1,0 +1,30 @@
+#!/bin/bash
+
+now=`date +%Y-%m-%d_%H-%M-%S`
+backup_directory="/data/backups"
+current_backup="$backup_directory/$now"_full
+
+logfile="/var/log/db-backup/"$now"_full"
+
+mysql_user="sbiadmin"
+mysql_pass="t1m3t0J@M"
+
+
+echo "========================================="
+echo "        MySQL Data Backup (Full)"
+echo "========================================="
+
+#perform full backup
+innobackupex --ibbackup=xtrabackup_55 --parallel=8 --user=$mysql_user --password=$mysql_pass --no-timestamp $current_backup 2> $logfile
+
+# see if the backup completed sucsessfully
+if ! tail $logfile -n 1 | grep completed.OK
+then
+        rm -R $current_backup
+        echo "\nERROR: backup failed! (log: "$logfile")"
+  exit 1
+fi
+
+echo $current_backup > $backup_directory/last_backup
+
+echo "Backup Completed OK!"

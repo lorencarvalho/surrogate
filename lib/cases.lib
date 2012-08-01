@@ -1,0 +1,247 @@
+#!/bin/bash
+
+# Primary casefile for Surrogate
+
+  #-#-#  
+  #-#-# 
+  #-#-#
+
+function fullbackup() {
+echo "========================================="
+echo "        MySQL Data Backup (Full)"
+echo "========================================="
+
+#perform full backup
+innobackupex --ibbackup=xtrabackup_55 --parallel=8 --user=$mysql_user --password=$mysql_pass --no-timestamp $current_backup_f 2> $logfile_f
+
+# see if the backup completed sucsessfully
+if ! tail $logfile_f -n 1 | grep completed.OK
+then
+        rm -R $current_backup_f
+        echo "\nERROR: backup failed! (log: "$logfile_f")"
+  exit 1
+fi
+
+echo $current_backup_f > $backup_directory/last_backup
+
+echo "Backup Completed OK!"
+}
+
+  #-#-# 
+  #-#-# 
+  #-#-#
+
+function incbackup() {
+echo "========================================="
+echo "      MySQL Data Backup (Incremental)"
+echo "========================================="
+
+#perform incremental backup from where the last backup stoped
+innobackupex --ibbackup=xtrabackup_55 --parallel=4 --user=$mysql_user --password=$mysql_pass --no-timestamp --incremental --incremental-basedir=$last_backup $current_backup_i 2> $logfile_i
+
+# see if the backup completed sucsessfully
+if ! tail $logfile_i -n 1 | grep completed.OK
+then
+        rm -R $current_backup_i
+        echo "\nERROR: backup failed! (log: "$logfile_i")"
+  exit 1
+fi
+
+echo $current_backup_i >> $backup_directory/last_backup
+
+echo "Backup Completed OK!"
+}
+
+  #-#-# 
+  #-#-# 
+  #-#-#
+
+function restorebackup() {
+echo "========================================="
+echo "           MySQL Data Restore"
+echo "========================================="
+
+full_backup=`head $restore -n 1`
+
+if [ -d $active_backup ];
+then
+ rm -R $active_backup
+fi
+
+echo "copying full backup files: " $full_backup
+mkdir $active_backup
+cp -r $full_backup/* $active_backup
+
+echo "preparing full backup..."
+innobackupex --ibbackup=xtrabackup_55 --parallel=4 --user=$mysql_user --password=$mysql_pass --apply-log --redo-only $active_backup 2> $logfile_r
+
+# see if the apply-log completed sucsessfully
+if ! tail $logfile_r -n 1 | grep completed.OK
+then
+        echo "\nERROR: restore failed! (log: "$logfile_r")"
+        rm -R $active_backup
+        exit 1
+fi
+
+grep _in $restore | while read incremental_backup ; do
+
+ if [ -d $active_incremental ];
+ then
+  rm -R $active_incremental
+ fi
+
+ echo "copying incremental backup: " $incremental_backup
+ mkdir $active_incremental
+ cp -r $incremental_backup/* $active_incremental
+
+ find $incremental_backup -name .delta -empty -maxdepth 2 -exec rm {} \;
+
+        echo "preparing incremetal backup..."
+ innobackupex --ibbackup=xtrabackup_55 --parallel=4 --user=$mysql_user --password=$mysql_pass --apply-log --redo-only $active_backup --incremental-dir=$active_incremental 2>> $logfile_r
+
+ rm -R $active_incremental
+
+ # see if the apply incremental completed sucsessfully
+ if ! tail $logfile_r -n 1 | grep completed.OK
+ then
+         echo "\nERROR: restore failed! (log: "$logfile_r")"
+         rm -R $active_backup
+         exit 1
+ fi
+
+done
+
+echo "applying Logs"
+innobackupex --ibbackup=xtrabackup_55 --parallel=4 --user=$mysql_user --password=$mysql_pass --apply-log $active_backup 2>> $logfile_r
+
+# see if the apply log completed sucsessfully
+if ! tail $logfile_r -n 1 | grep completed.OK
+then
+ echo "\nERROR: restore failed! (log: "$logfile_r")"
+        rm -R $active_backup
+        exit 1
+fi
+
+/etc/init.d/mysql stop
+
+echo "moving mysql data files..."
+
+rm -rf $mysql_sanity_path
+mv -f $mysql_data_path $mysql_sanity_path
+mkdir -p $mysql_data_path
+
+echo "restoring data files..."
+
+#can use the innobackup script to restore data
+innobackupex --ibbackup=xtrabackup_55 --user=$mysql_user --password=$mysql_pass --copy-back $active_backup 2>> $logfile_r
+
+#delete all log files to start with fresh bin and mysql logs
+rm -R $mysql_log_path/*
+mkdir $mysql_log_path/bin
+
+echo "setting file permissions.."
+chmod 700 -R $mysql_data_path/ && chown mysql:mysql -R $mysql_data_path/
+chmod 700 -R $mysql_log_path/ && chown mysql:mysql -R $mysql_log_path/
+
+rm -R $active_backup/*
+rmdir $active_backup
+#rm $mysql_data_path/xtrabackup*
+
+/etc/init.d/mysql start
+
+echo "Restore Completed OK!"
+}
+
+#-#-#
+#-#-#
+#-#-#
+
+function compressbackup() {
+
+echo "========================================="
+echo "           MySQL Compress                " 
+echo "========================================="
+
+
+full_backup=`head $compress -n 1`
+
+echo $full_backup
+
+if [ -d $active_backup ];
+then
+ rm -R $active_backup
+fi
+
+echo "copying full backup files: " $full_backup
+mkdir $active_backup
+cp -r $full_backup/* $active_backup
+
+echo "preparing full backup..."
+innobackupex --ibbackup=xtrabackup_55 --parallel=4 --user=$mysql_user --password=$mysql_pass --apply-log --redo-only $active_backup 2> $logfile_c
+
+# see if the apply-log completed sucsessfully
+if ! tail $logfile_c -n 1 | grep completed.OK
+then
+        echo "\nERROR: restore failed!"
+	rm -R $active_backup
+        exit 1
+fi
+
+
+grep _in $compress | while read incremental_backup ; do
+
+ if [ -d $active_incremental ];
+ then
+  rm -R $active_incremental
+ fi
+
+ echo "copying incremental backup: " $incremental_backup
+ mkdir $active_incremental
+ cp -r $incremental_backup/* $active_incremental
+
+ find $incremental_backup -name .delta -empty -maxdepth 2 -exec rm {} \;
+
+        echo "preparing incremetal backup..."
+ innobackupex --ibbackup=xtrabackup_55 --parallel=4 --user=$mysql_user --password=$mysql_pass --apply-log --redo-only $active_backup --incremental-dir=$active_incremental 2>> $logfile_c
+
+ rm -R $active_incremental
+
+ # see if the apply incremental completed sucsessfully
+ if ! tail $logfile_c -n 1 | grep completed.OK
+ then
+         echo "\nERROR: collapse failed!"
+         rm -R $active_backup
+         exit 1
+ fi
+
+done
+
+echo "applying Logs"
+innobackupex --ibbackup=xtrabackup_55 --parallel=4 --user=$mysql_user --password=$mysql_pass --apply-log $active_backup 2>> $logfile_c
+
+echo "Saving collapsed backup..."
+
+mkdir -p $backup_directory/$backup_filename
+mv $active_backup/* $backup_directory/$backup_filename
+
+tar -cvzf $mysql_collapse_path/$backup_filename.tgz $backup_directory/$backup_filename
+rm -rf $backup_directory/$backup_filename/*
+rmdir $backup_directory/$backup_filename
+
+#delete all log files to start with fresh bin and mysql logs
+rm -R $mysql_log_path/*
+mkdir $mysql_log_path/bin
+
+
+ if [ -d $active_backup ];
+ then
+  rm -R $active_backup/*
+  rmdir $active_backup
+ fi
+
+echo "Collapse Completed OK!"
+}
+
+#-#-#
+#-#-#
+#-#-#
