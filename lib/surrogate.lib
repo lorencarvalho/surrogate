@@ -19,5 +19,5 @@ MY_NAME=$(basename $0)
 #echo -e "CWD \t$MY_ROOT"
 #echo -e "PID \t$MY_PID"
 
-source $MY_ROOT/conf/aj.conf
+source $MY_ROOT/conf/*.conf
 source $MY_ROOT/lib/cases.lib

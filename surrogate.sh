@@ -32,9 +32,17 @@ cat << EOF
 EOF
 }
 
-type=
-restore=
-promote=
+#
+# Empty vars on initial call, reuse init() if needed
+#
+
+function init() {
+type=""
+restore=""
+promote=""
+}
+
+init
 
 while getopts "hb:r:p:c:" option 
 do
