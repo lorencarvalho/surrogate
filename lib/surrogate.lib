@@ -13,7 +13,5 @@ else
     MY_ROOT=$(dirname $0) ;
 fi ;
 
-echo $MY_ROOT 
-
 source $MY_ROOT/conf/*.conf
 source $MY_ROOT/lib/cases.lib

@@ -17,17 +17,17 @@ source ./lib/surrogate.lib
 
 function usage() { 
 cat << EOF
+usage: $0 options
 
-	usage: $0 options
+This script expects some arguments, please oblige!
 
-	This script expects some arguments, please oblige!
+OPTIONS:
 
-	OPTIONS:
-	-h	Shows this message
-	-b	Backup, either incremental or full, "-b incremental"
-	-r 	Restore, accepts the full path of a restore list "-r /path/to/file"
-	-c	Compress, compresses everything in 'last_backup'
-	-p	Promote
+-h	Shows this message
+-b	Backup, either incremental or full, "-b incremental"
+-r 	Restore, accepts the full path of a restore list "-r /path/to/file"
+-c	Compress, compresses everything in 'last_backup'
+-p	Promote
 
 EOF
 }
@@ -43,6 +43,8 @@ promote=""
 }
 
 init
+
+[[ ! $1 ]] && { usage; }
 
 while getopts "hb:r:p:c:" option 
 do
@@ -86,7 +88,3 @@ do
 
 	esac
 done
-
-echo $type
-echo $restore
-echo $promote
