@@ -7,17 +7,13 @@
 # Configuration
 # Get current working directory & script information
 
-LSOF=$(lsof -p $$ | grep -E "/"$(basename $0)"$")
-MY_PATH=$(echo $LSOF | sed -r s/'^([^\/]+)\/'/'\/'/1 2>/dev/null)
+if [ -L $0 ] ; then
+    MY_ROOT=$(dirname $(readlink -f $0)) ;
+else
+    MY_ROOT=$(dirname $0) ;
+fi ;
 
-MY_PID=$$
-MY_ROOT=$(dirname $MY_PATH)
-MY_NAME=$(basename $0)
-
-#echo -e "PATH\t$MY_PATH"
-#echo -e "FILE\t$MY_NAME"
-#echo -e "CWD \t$MY_ROOT"
-#echo -e "PID \t$MY_PID"
+echo $MY_ROOT 
 
 source $MY_ROOT/conf/*.conf
 source $MY_ROOT/lib/cases.lib
