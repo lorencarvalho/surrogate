@@ -4,12 +4,12 @@
 # SURROGATE database control utility
 # ----
 
-
 #
-# Get defaults / call mainloop
+# Get configuration
 #
 
-source ./lib/surrogate.lib
+source ./conf/*
+source ./lib/full.lib
 
 #
 # Usage, getops
@@ -60,9 +60,7 @@ do
 		if [[ "$type" == "full" ]]; then
 			fullbackup
 		elif [[ "$type" == "inc" ]]; then
-			
 			incbackup
-
 		else
 
 			echo "Please specify full or incremental"
