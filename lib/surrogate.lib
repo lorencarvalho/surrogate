@@ -9,7 +9,7 @@ do
 	source $MY_ROOT/conf/$config
 done
 
-for library in $(ls $MY_ROOT/lib/);
+for library in $(ls $MY_ROOT/lib/ | grep -v surrogate.lib );
 do
 	source $MY_ROOT/lib/$library
 done
