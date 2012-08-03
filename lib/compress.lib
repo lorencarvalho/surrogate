@@ -83,7 +83,6 @@ mkdir $mysql_log_path/bin
 
  if [ -d $active_backup ];
  then
-  rm -R $active_backup/*
   rmdir $active_backup
  fi
 
