@@ -1,6 +1,6 @@
 # surrogate
 # mysql collapse/compress function
-
+set -x
 function compressbackup() {
 echolog "collapsing & compressing " $full_backup
 
