@@ -1,6 +1,7 @@
+#!/bin/bash
 # surrogate
 # mysql collapse/compress function
-set -x
+
 function compressbackup() {
 echo "collapsing & compressing " $full_backup
 
