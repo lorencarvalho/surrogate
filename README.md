@@ -1,8 +1,7 @@
-    ---
-     _   _ _   _ __/_    
+```     _   _ _   _ __/_    
    _) (// / ()(/(//(-    
              _/          
- "always use protection"
+ "always use protection"```
  
 #### Usage
 
