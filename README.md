@@ -1,5 +1,8 @@
 ### Surrogate
-_"Always use protection"_
+#### Always use protection
+
+A simple bash wrapper for Percona's Xtrabackup utility.
+
 ----
 
 #### Usage
