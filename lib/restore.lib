@@ -5,7 +5,7 @@ echo "========================================="
 echo "           MySQL Data Restore"
 echo "========================================="
 
-full_backup=`head $restore -n 1`
+full_backup=$restore
 
 if [ -d $active_backup ];
 then
