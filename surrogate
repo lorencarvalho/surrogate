@@ -74,8 +74,8 @@ do
 		;;
 
 		c)
-		compress=$OPTARG
-		echo $compress
+		# compress=$OPTARG
+		# echo $compress
 		compressbackup
 		;;
 		
