@@ -1,5 +1,5 @@
 ### Surrogate
-#### Always use protection
+#### _ Bring back life form. Priority One. All other priorities rescinded. _
 
 A simple bash wrapper for Percona's Xtrabackup utility.
 
