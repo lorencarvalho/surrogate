@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# ----
+# SURROGATE database control utility
+# ----
+
+for config in $(ls $MY_ROOT/conf/);
+do
+	source $MY_ROOT/conf/$config
+done
+
+for library in $(ls $MY_ROOT/lib/);
+do
+	source $MY_ROOT/lib/$library
+done

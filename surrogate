@@ -8,8 +8,7 @@
 # Get configuration
 #
 
-source ./conf/*
-source ./lib/full.lib
+source lib/.surrogate.lib
 
 #
 # Usage, getops

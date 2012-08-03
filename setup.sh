@@ -1,12 +1,16 @@
 #!/bin/bash
 # prepares proper directories and permissions
 
+set -x
+
+
 if [ `whoami` != root ]; then
     echo Please run this script as root or using sudo
     exit
 fi
 
-source surrogate
+source conf/s.conf
+source lib/.surrogate.lib
 
 [[ ! -d $backup_directory  ]] && { mkdir -p $backup_directory ; }
 [[ ! -d $mysql_sanity_path  ]] && { mkdir -p $mysql_sanity_path ; }
