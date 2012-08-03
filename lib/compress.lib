@@ -7,6 +7,12 @@ echo "========================================="
 
 full_backup=`head $compress -n 1`
 
+if [ -z "$full_backup"];
+ then
+	exit 1
+fi
+
+
 echo $full_backup
 
 if [ -d $active_backup ];
