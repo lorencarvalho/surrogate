@@ -1,0 +1,26 @@
+#!/bin/bash
+
+function incbackup() {
+echo "========================================="
+echo "      MySQL Data Backup (Incremental)"
+echo "========================================="
+
+#perform incremental backup from where the last backup stoped
+innobackupex --ibbackup=xtrabackup_55 --parallel=4 --user=$mysql_user --password=$mysql_pass --no-timestamp --incremental --incremental-basedir=$last_backup $current_backup_i 2> $logfile_i
+
+# see if the backup completed sucsessfully
+if ! tail $logfile_i -n 1 | grep completed.OK
+then
+        rm -R $current_backup_i
+        echo "\nERROR: backup failed! (log: "$logfile_i")"
+  exit 1
+fi
+
+echo $current_backup_i >> $backup_directory/last_backup
+
+echo "Backup Completed OK!"
+}
+
+  #-#-# 
+  #-#-# 
+  #-#-#
