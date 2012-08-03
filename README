@@ -1,4 +1,31 @@
-SURROGATE 
-Database backup & control utlity
+ ========================   
+=                         =
+=     _   _ _   _ __/_    =
+=   _) (// / ()(/(//(-    =
+=             _/          =
+=                         =
+= Percona Backup wrapper  =
+=                         =
+= `always use protection` =
+=                         =
+ ========================
 
-always use protection
+ by, Loren Carvalho
+
+
+ =
+=  Usage
+
+sh surrogate -h
+
+-h	Shows this message
+-b	Backup, either incremental or full, "-b incremental"
+-r 	Restore, accepts the full path of a restorable directory "-r /path/to/dir"
+-c	Compress, compresses everything in 'last_backup'
+-p	Promote * work in progress *
+
+=
+ =
+
+
+
