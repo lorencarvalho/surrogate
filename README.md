@@ -1,9 +1,7 @@
-    ---
-     _   _ _   _ __/_    
-   _) (// / ()(/(//(-    
-             _/          
- "always use protection"```
- 
+##### Surrogate
+_"Always use protection"_
+----
+
 #### Usage
 
 `sh surrogate -<switch> <argument>`
