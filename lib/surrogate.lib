@@ -1,15 +1,23 @@
 #!/bin/bash
+# surrogate
+# mainloop lib
 
-# ----
-# SURROGATE database control utility
-# ----
+# get config file(s)
+for config in $(ls $my_root/conf/);
+	do
+		source $my_root/conf/$config
+	done
 
-for config in $(ls $MY_ROOT/conf/);
-do
-	source $MY_ROOT/conf/$config
-done
+# load all libs
+for library in $(ls $my_root/lib/ | grep -v surrogate.lib );
+	do
+		source $my_root/lib/$library
+	done
 
-for library in $(ls $MY_ROOT/lib/ | grep -v surrogate.lib );
-do
-	source $MY_ROOT/lib/$library
-done
+# echolog function
+echolog() {
+  echo $@ >> $log
+  echo $@
+}
+
+# fin

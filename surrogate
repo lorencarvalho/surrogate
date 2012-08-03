@@ -1,41 +1,30 @@
 #!/bin/bash
+# surrogate
+# loren carvalho, 2012
 
-# ----
-# SURROGATE database control utility
-# ----
-
-#
-# Get configuration
-#
-
+# configs
 source conf/s.conf
 source lib/surrogate.lib
 
-#
-# Usage, getops
-#
-
+# explain the usage
 function usage() { 
-cat << EOF
-usage: $0 options
+cat <<-EOF
+	usage: $0 options
 
-This script expects some arguments, please oblige!
+	This script expects some arguments, please oblige!
 
-OPTIONS:
+	OPTIONS:
 
--h	Shows this message
--b	Backup, either incremental or full, "-b incremental"
--r 	Restore, accepts the full path of a restore list "-r /path/to/file"
--c	Compress, compresses everything in 'last_backup'
--p	Promote
-
+	-h	Shows this message
+	-b	Backup, either incremental or full, "-b incremental"
+	-r 	Restore, accepts the full path of a restore list "-r /path/to/file"
+	-c	Compress, compresses everything in 'last_backup'
+	-p	Promote
+	
 EOF
 }
 
-#
-# Empty vars on initial call, reuse init() if needed
-#
-
+# empty vars on initial call, can reuse init() if needed
 function init() {
 type=""
 restore=""
@@ -44,45 +33,42 @@ promote=""
 
 init
 
+# if there is no input, barf
 [[ ! $1 ]] && { usage; }
 
+# get input
 while getopts "hb:r:p:c:" option 
-do
-	case $option in
-
+	do
+		case $option in
 		h)
-		usage
-		exit 1
-		;;
-	
-		b)
-		type=$OPTARG
-		if [[ "$type" == "full" ]]; then
-			fullbackup
-		elif [[ "$type" == "inc" ]]; then
-			incbackup
-		else
-
-			echo "Please specify full or incremental"
+			usage
 			exit 1
-		fi
 		;;
-	
+		b)
+			type=$OPTARG
+			if [[ "$type" == "full" ]]; then
+				fullbackup
+			elif [[ "$type" == "inc" ]]; then
+				incbackup
+			else	
+				echo "Please specify full or incremental"
+				exit 1
+			fi
+		;;
 		r)
-		restore=$OPTARG
-		restorebackup
+			restore=$OPTARG
+			restorebackup
 		;;
-
 		c)
-		compress=$OPTARG
-		echo $compress
-		compressbackup
+			compress=$OPTARG
+			echo $compress
+			compressbackup
 		;;
-		
 		p)
-		promote=$OPTARG
-		# then run the promote case
+			promote=$OPTARG
+			# then run the promote case
 		;;
+		esac
+	done
 
-	esac
-done
+# fin
