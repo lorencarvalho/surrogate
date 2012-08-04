@@ -18,7 +18,7 @@ cat <<-EOF
 	-h	Shows this message
 	-b	Backup, either incremental or full, "-b incremental"
 	-r 	Restore, accepts the full path of a restore list "-r /path/to/file"
-	-c	Compress, compresses everything in 'last_backup'
+	-c	Collapse, merges incremental and full backups from the 'last_backup' list
 	-p	Promote
 	
 EOF
@@ -60,9 +60,9 @@ while getopts "hb:r:p:c:" option
 			restorebackup
 		;;
 		c)
-			compress=$OPTARG
-			echo $compress
-			compressbackup
+			collapse=$OPTARG
+			echo $collapse
+			collapsebackup
 		;;
 		p)
 			promote=$OPTARG

@@ -1,12 +1,12 @@
 #!/bin/bash
 # surrogate
-# mysql collapse/compress function
+# mysql collapse backup script
 
-function compressbackup() {
-echo "collapsing & compressing " $full_backup
+function collapsebackup() {
+echo "collapsing " $full_backup
 
 # get last full backup location
-full_backup=`head $compress -n 1`
+full_backup=`head $collapse -n 1`
 
 if [ -z "$full_backup" | "backup_directory" | "backup_filename" ];
 	then
@@ -41,7 +41,7 @@ if ! tail $logfile_c -n 1 | grep completed.OK
 	        exit 1
 fi
 
-grep _in $compress | while read incremental_backup ; do
+grep _in $collapse | while read incremental_backup ; do
 if [ -d $active_incremental ];
 	then
 		rm -R $active_incremental
@@ -84,9 +84,9 @@ echo "saving collapsed backup..."
 mkdir -p $backup_directory/$backup_filename
 mv $active_backup/* $backup_directory/$backup_filename
 
-echo "compressing with tar"
-tar -czf $mysql_collapse_path/$backup_filename.tgz $backup_directory/$backup_filename
-
+# echo "compressing with tar"
+# tar -czf $mysql_collapse_path/$backup_filename.tgz $backup_directory/$backup_filename
+# 
 echo "removing stale data"
 rm -rf $backup_directory/$backup_filename/*
 rmdir $backup_directory/$backup_filename
