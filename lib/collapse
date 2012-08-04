@@ -24,13 +24,13 @@ echo "copying full backup files: " $full_backup
 mkdir -p $active_backup
 rsync -a $full_backup/ $active_backup/
 echo "preparing full backup..."
-innobackupex \
---ibbackup=xtrabackup_55 \
---parallel=4 \
---user=$mysql_user \
---password=$mysql_pass \
---apply-log \
---redo-only \
+innobackupex 			\
+--ibbackup=xtrabackup_55 	\
+--parallel=4 			\
+--user=$mysql_user 		\
+--password=$mysql_pass 		\
+--apply-log 			\
+--redo-only 			\
 $active_backup 2> $logfile_c
 
 echo "checking if the apply-log completed succsessfully"
@@ -53,13 +53,13 @@ cp -r $incremental_backup/ $active_incremental/
 find $incremental_backup -name .delta -empty -maxdepth 2 -exec rm '{}' '\;'
 
 echo "preparing incremetal backup..."
-innobackupex \
---ibbackup=xtrabackup_55 \
---parallel=4 \
---user=$mysql_user \
---password=$mysql_pass \
---apply-log \
---redo-only $active_backup \
+innobackupex 			\
+--ibbackup=xtrabackup_55 	\
+--parallel=4 			\
+--user=$mysql_user 		\
+--password=$mysql_pass 		\
+--apply-log 			\
+--redo-only $active_backup 	\
 --incremental-dir=$active_incremental 2>> $logfile_c
 
 rm -R $active_incremental
@@ -73,11 +73,11 @@ if ! tail $logfile_c -n 1 | grep completed.OK
 fi
 
 echo "applying Logs"
-innobackupex \
---ibbackup=xtrabackup_55 \
---parallel=4 \
---user=$mysql_user \
---password=$mysql_pass \
+innobackupex 			\
+--ibbackup=xtrabackup_55 	\
+--parallel=4 			\
+--user=$mysql_user 		\
+--password=$mysql_pass 		\
 --apply-log $active_backup 2>> $logfile_c
 
 echo "saving collapsed backup..."

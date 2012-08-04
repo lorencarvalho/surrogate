@@ -17,12 +17,12 @@ mkdir $active_backup
 cp -r $full_backup/* $active_backup
 
 echo "preparing full backup..."
-innobackupex \
---ibbackup=xtrabackup_55 \
---parallel=4 \
---user=$mysql_user \
---password=$mysql_pass \
---apply-log \
+innobackupex 			\
+--ibbackup=xtrabackup_55 	\
+--parallel=4 			\
+--user=$mysql_user 		\
+--password=$mysql_pass 		\
+--apply-log 			\
 --redo-only $active_backup 2> $logfile_r
 
 # see if the apply-log completed sucsessfully
@@ -46,13 +46,13 @@ cp -r $incremental_backup/* $active_incremental
 find $incremental_backup -name .delta -empty -maxdepth 2 -exec rm {} \;
 
 echo "preparing incremetal backup..."
-innobackupex \
---ibbackup=xtrabackup_55 \
---parallel=4 \
---user=$mysql_user \
---password=$mysql_pass \
---apply-log \
---redo-only $active_backup \
+innobackupex 			\
+--ibbackup=xtrabackup_55 	\		
+--parallel=4 			\
+--user=$mysql_user 		\
+--password=$mysql_pass 		\
+--apply-log 			\
+--redo-only $active_backup 	\
 --incremental-dir=$active_incremental 2>> $logfile_r
 
 rm -R $active_incremental
@@ -66,11 +66,11 @@ if ! tail $logfile_r -n 1 | grep completed.OK
 fi
 
 echo "applying Logs"
-innobackupex \
---ibbackup=xtrabackup_55 \
---parallel=4 \
---user=$mysql_user \
---password=$mysql_pass \
+innobackupex 			\
+--ibbackup=xtrabackup_55 	\
+--parallel=4 			\
+--user=$mysql_user 		\
+--password=$mysql_pass 		\
 --apply-log $active_backup 2>> $logfile_r
 
 echo "check if the apply log completed sucsessfully"
@@ -89,10 +89,10 @@ mv -f $mysql_data_path $mysql_sanity_path
 mkdir -p $mysql_data_path
 echo "restoring data files..."
 echo "calling innobackupex..."
-innobackupex \
---ibbackup=xtrabackup_55 \
---user=$mysql_user \
---password=$mysql_pass \
+innobackupex 			\
+--ibbackup=xtrabackup_55 	\
+--user=$mysql_user 		\
+--password=$mysql_pass 		\
 --copy-back $active_backup 2>> $logfile_r
 
 echo "delete all log files to start fresh after restore"

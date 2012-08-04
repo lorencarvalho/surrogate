@@ -4,14 +4,14 @@ function incbackup() {
 echo "creating incremental backup"
 
 #perform incremental backup from where the last backup stoped
-innobackupex \
---ibbackup=xtrabackup_55 \
---parallel=4 \
---user=$mysql_user \
---password=$mysql_pass \
---no-timestamp \
---incremental \
---incremental-basedir=$last_backup \
+innobackupex 				\
+--ibbackup=xtrabackup_55 		\
+--parallel=4 				\
+--user=$mysql_user 			\
+--password=$mysql_pass 			\
+--no-timestamp 				\
+--incremental 				\
+--incremental-basedir=$last_backup 	\
 $current_backup_i 2> $logfile_i
 
 echo "checking if the backup completed sucsessfully"
