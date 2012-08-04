@@ -1,11 +1,9 @@
 #!/bin/bash
+# surrogate
+# mysql full backup function
 
 function fullbackup() {
-echo "========================================="
-echo "        MySQL Data Backup (Full)"
-echo "========================================="
-
-#perform full backup
+echo "creating full backup"
 
 innobackupex 				\
 --ibbackup=xtrabackup_55 		\
@@ -14,19 +12,16 @@ innobackupex 				\
 --no-timestamp 				\
 $current_backup_f 2> $logfile_f
 
-# see if the backup completed sucsessfully
+echo "see if the backup completed sucsessfully"
 if ! tail $logfile_f -n 1 | grep completed.OK
-then
-        rm -R $current_backup_f
-        echo "\nERROR: backup failed! (log: "$logfile_f")"
-  exit 1
+	then
+        	rm -R $current_backup_f
+	        echo "\nERROR: backup failed! (log: "$logfile_f")"
+		exit 1
 fi
 
 echo $current_backup_f > $backup_directory/last_backup
-
 echo "Backup Completed OK!"
 }
 
-  #-#-# 
-  #-#-# 
-  #-#-#
+# fin
