@@ -23,20 +23,19 @@ fi
 echo "copying full backup files: " $full_backup
 mkdir -p $active_backup
 rsync -a $full_backup/ $active_backup/
-#echo "preparing full backup..."
+echo "preparing full backup..."
 innobackupex 			\
 --ibbackup=xtrabackup_55 	\
 --parallel=4 			\
 --user=$mysql_user 		\
 --password=$mysql_pass 		\
 --apply-log 			\
---redo-only 			\
-$active_backup 2> $logfile_c
+--redo-only $active_backup 2> $logfile_c
 
 echo "checking if the apply-log completed succsessfully"
 if ! tail $logfile_c -n 1 | grep completed.OK
 	then
-        	echo "\nERROR: restore failed!"
+        	echo "\nERROR: collapse failed! (log: "$logfile_c") "
 		rm -R $active_backup
 	        exit 1
 fi
@@ -67,7 +66,7 @@ rm -R $active_incremental
 echo "checking if the apply incremental completed sucsessfully"
 if ! tail $logfile_c -n 1 | grep completed.OK
 	then
-        	echo "\nERROR: collapse failed!"
+        	echo "\nERROR: collapse failed! (log: "$logfile_f")"
          	rm -R $active_backup
          	exit 1
 fi
@@ -104,3 +103,4 @@ echo "Collapse Completed OK!"
 }
 
 # fin
+
