@@ -3,7 +3,7 @@
 # mysql collapse backup script
 
 function collapsebackup() {
-#echo "collapsing " $full_backup
+echo "collapsing " $full_backup
 
 # get last full backup location
 full_backup=`head $collapse -n 1`
@@ -13,14 +13,14 @@ if [ -z "$full_backup" | "backup_directory" | "backup_filename" ];
 		exit 1
 fi
 
-#echo $full_backup
+echo $full_backup
 
 if [ -d $active_backup ];
 	then
 	rm -R $active_backup
 fi
 
-#echo "copying full backup files: " $full_backup
+echo "copying full backup files: " $full_backup
 mkdir -p $active_backup
 rsync -a $full_backup/ $active_backup/
 #echo "preparing full backup..."
@@ -33,7 +33,7 @@ innobackupex 			\
 --redo-only 			\
 $active_backup 2> $logfile_c
 
-#echo "checking if the apply-log completed succsessfully"
+echo "checking if the apply-log completed succsessfully"
 if ! tail $logfile_c -n 1 | grep completed.OK
 	then
         	echo "\nERROR: restore failed!"
@@ -47,12 +47,12 @@ if [ -d $active_incremental ];
 		rm -R $active_incremental
 fi
 
-#echo "copying incremental backup: " $incremental_backup
+echo "copying incremental backup: " $incremental_backup
 mkdir $active_incremental
 cp -r $incremental_backup/ $active_incremental/
 find $incremental_backup -name .delta -empty -maxdepth 2 -exec rm '{}' '\;'
 
-#echo "preparing incremetal backup..."
+echo "preparing incremetal backup..."
 innobackupex 			\
 --ibbackup=xtrabackup_55 	\
 --parallel=4 			\
@@ -64,7 +64,7 @@ innobackupex 			\
 
 rm -R $active_incremental
 
-#echo "checking if the apply incremental completed sucsessfully"
+echo "checking if the apply incremental completed sucsessfully"
 if ! tail $logfile_c -n 1 | grep completed.OK
 	then
         	echo "\nERROR: collapse failed!"
@@ -72,7 +72,7 @@ if ! tail $logfile_c -n 1 | grep completed.OK
          	exit 1
 fi
 
-#echo "applying Logs"
+echo "applying Logs"
 innobackupex 			\
 --ibbackup=xtrabackup_55 	\
 --parallel=4 			\
@@ -80,18 +80,19 @@ innobackupex 			\
 --password=$mysql_pass 		\
 --apply-log $active_backup 2>> $logfile_c
 
-#echo "saving collapsed backup..."
+echo "saving collapsed backup..."
 mkdir -p $backup_directory/$backup_filename
 mv $active_backup/* $backup_directory/$backup_filename
 
-# echo "compressing with tar"
-# tar -czf $mysql_collapse_path/$backup_filename.tgz $backup_directory/$backup_filename
-# 
-#echo "removing stale data"
+## echo "compressing with tar"
+## tar -czf $mysql_collapse_path/$backup_filename.tgz $backup_directory/$backup_filename
+##
+ 
+echo "removing stale data"
 rm -rf $backup_directory/$backup_filename/*
 rmdir $backup_directory/$backup_filename
 
-#echo "delete some tmp dirs"
+echo "delete some tmp dirs"
 rm -R $mysql_log_path/*
 mkdir $mysql_log_path/bin
 if [ -d $active_backup ];
