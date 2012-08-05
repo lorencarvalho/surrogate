@@ -45,6 +45,7 @@ if [ -d $active_incremental ];
 	then
 		rm -R $active_incremental
 fi
+done
 
 echo "copying incremental backup: " $incremental_backup
 mkdir $active_incremental
