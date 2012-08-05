@@ -8,7 +8,7 @@ echo "collapsing " $full_backup
 # get last full backup location
 full_backup=`head $collapse -n 1`
 
-if [ -z "$full_backup" | "backup_directory" | "backup_filename" ];
+if [ -z "$full_backup" | "$backup_directory" | "$backup_filename" ];
 	then
 		exit 1
 fi
@@ -86,7 +86,6 @@ mv $active_backup/* $backup_directory/$backup_filename
 
 ## echo "compressing with tar"
 ## tar -czf $mysql_collapse_path/$backup_filename.tgz $backup_directory/$backup_filename
-##
  
 echo "removing stale data"
 rm -rf $backup_directory/$backup_filename/*
