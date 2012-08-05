@@ -8,7 +8,7 @@ echo "collapsing " $full_backup
 # get last full backup location
 full_backup=`head $collapse -n 1`
 
-if [ -z "$full_backup" | "$backup_directory" | "$backup_filename" ];
+if [ -z "$full_backup" ]; # | "$backup_directory" | "$backup_filename" ];
 	then
 		exit 1
 fi
