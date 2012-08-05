@@ -35,12 +35,12 @@ innobackupex 			\
 echo "checking if the apply-log completed succsessfully"
 if ! tail $logfile_c -n 1 | grep completed.OK
 	then
-        	echo "\nERROR: collapse failed! (log: "$logfile_c") "
+       	echo "\nERROR: collapse failed! (log: "$logfile_c") "
 		rm -R $active_backup
 	        exit 1
 fi
 
-grep _in $collapse | while read incremental_backup ; do
+grep _in $collapse | while read $incremental_backup ; do
 if [ -d $active_incremental ];
 	then
 		rm -R $active_incremental
@@ -49,7 +49,7 @@ fi
 echo "copying incremental backup: " $incremental_backup
 mkdir $active_incremental
 cp -r $incremental_backup/ $active_incremental/
-find $incremental_backup -name .delta -empty -maxdepth 2 -exec rm '{}' '\;'
+find $incremental_backup -name .delta -empty -maxdepth 2 -exec rm {} \;
 
 echo "preparing incremetal backup..."
 innobackupex 			\
@@ -66,7 +66,7 @@ rm -R $active_incremental
 echo "checking if the apply incremental completed sucsessfully"
 if ! tail $logfile_c -n 1 | grep completed.OK
 	then
-        	echo "\nERROR: collapse failed! (log: "$logfile_f")"
+        	echo "\nERROR: collapse failed! (log: "$logfile_c")"
          	rm -R $active_backup
          	exit 1
 fi
@@ -103,4 +103,3 @@ echo "Collapse Completed OK!"
 }
 
 # fin
-
