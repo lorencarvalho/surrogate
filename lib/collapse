@@ -20,7 +20,7 @@ fi
 
 echo "copying full backup files: " $full_backup
 mkdir -p $active_backup
-rsync -a $full_backup/ $active_backup/
+cp -R $full_backup/ $active_backup/
 echo "preparing full backup..."
 innobackupex 			\
 --ibbackup=xtrabackup_55 	\
