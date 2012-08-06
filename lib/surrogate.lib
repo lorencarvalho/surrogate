@@ -14,10 +14,9 @@ for library in $(ls $my_root/lib/ | grep -v surrogate.lib );
 		source $my_root/lib/$library
 	done
 
-# echolog function
-echolog() {
-  echo $@ >> $log
-  echo $@
+# check vars
+function checkvar() {
+    : "${!1:? "$1 is undefined, exiting."}"
 }
 
 # fin
