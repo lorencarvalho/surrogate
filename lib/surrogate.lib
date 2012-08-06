@@ -16,7 +16,7 @@ for library in $(ls $my_root/lib/ | grep -v surrogate.lib );
 
 # check vars
 function checkvar() {
-    : "${!1:? "$1 is undefined, exiting."}"
+    : "${ERROR:? "$1 is undefined, exiting."}"
 }
 
 # fin
