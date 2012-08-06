@@ -11,12 +11,6 @@ echo "collapsing " $full_backup
 # get last full backup location
 full_backup=`head $collapse -n 1`
 
-checkvar $full_backup
-checkvar $backup_directory
-checkvar $backup_filename
-checkvar $incremental_backup
-checkvar $active_incremental
-
 echo $full_backup
 
 if [ -d $active_backup ];
