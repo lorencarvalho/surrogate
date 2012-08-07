@@ -18,8 +18,6 @@ cat <<-EOF
 	-h	Shows this message
 	-b	Backup, either incremental or full, "-b incremental"
 	-r 	Restore, accepts the full path of a restore list "-r /path/to/file"
-	-c	Collapse, merges incremental and full backups from the 'last_backup' list
-	-p	Promote
 	
 EOF
 }
@@ -37,7 +35,7 @@ init
 [[ ! $1 ]] && { usage; }
 
 # get input
-while getopts "hb:r:p:c:" option 
+while getopts "hb:r:" option 
 	do
 		case $option in
 		h)
@@ -58,15 +56,6 @@ while getopts "hb:r:p:c:" option
 		r)
 			restore=$OPTARG
 			restorebackup
-		;;
-		c)
-			collapse=$OPTARG
-			echo $collapse
-			collapsebackup
-		;;
-		p)
-			promote=$OPTARG
-			# then run the promote case
 		;;
 		esac
 	done

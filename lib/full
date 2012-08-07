@@ -7,20 +7,21 @@ echo "creating full backup"
 
 innobackupex 				\
 --ibbackup=xtrabackup_55 		\
---parallel=8 --user=$mysql_user 	\
+--parallel=8				\ 
+--user=$mysql_user 			\
 --password=$mysql_pass 			\
 --no-timestamp 				\
-$current_backup_f 2> $logfile_f
+$full_backup_path 2> $logfile_f
 
-echo "see if the backup completed sucsessfully"
+echo "checking if the backup completed sucsessfully"
 if ! tail $logfile_f -n 1 | grep completed.OK
 	then
-        	rm -R $current_backup_f
+        	rm -R $full_backup_path
 	        echo "\nERROR: backup failed! (log: "$logfile_f")"
 		exit 1
 fi
 
-echo $current_backup_f > $backup_directory/last_backup
+echo $full_backup_path > $backup_directory/.digest
 echo "Backup Completed OK!"
 }
 
