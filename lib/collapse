@@ -2,9 +2,6 @@
 # surrogate
 # mysql collapse backup script
 
-# break if unset vars are encountered
-set -o
-
 function collapsebackup() {
 echo "collapsing " $full_backup
 
