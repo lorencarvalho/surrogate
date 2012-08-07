@@ -3,7 +3,7 @@
 # loren carvalho, 2012
 
 # configs
-source conf/s.conf
+source conf/surrogate.conf
 source lib/surrogate.lib
 
 # explain the usage
