@@ -8,8 +8,8 @@ _Bring back life form. Priority One. All other priorities rescinded._
 
 ### System Requirements
 
-Percona 5.5 (Reccomended, adjust the "binversion" configuration in xtrabackup.conf for older versions)
-
+- Percona 5.5 (Reccomended, for older versions adjust the "binversion" configuration in xtrabackup.conf)
+- Percona Xtrabackup 2.0
 
 #### Usage
 
