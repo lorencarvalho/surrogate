@@ -1,6 +1,7 @@
 #!/bin/bash
 # surrogate
 # loren carvalho, 2012
+set -u
 
 # configs
 source conf/surrogate.conf
@@ -17,8 +18,8 @@ cat <<-EOF
 	OPTIONS:
 
 	-h	Shows this message
-	-b	Backup, either incremental or full, "-b incremental"
-	-r 	Restore, accepts the full path of a restore list "-r /path/to/file"
+	-b	Backup, either incremental or full, "surrogate -b full" or "surrogate -b inc"
+	-r 	Restore, accepts the full path of a restorable directory
 	
 EOF
 }
