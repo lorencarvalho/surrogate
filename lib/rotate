@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# surrogate
+# backup rotation/retention
+set -u
+
+
+function rotate_backups() {
+# removing old dirs
+# daily_rotate=`date +%a -d "7 days ago"`
+# weekly_rotate=`date +%Y-%m -d "6 weeks ago"`
+# monthly_rotate=`date +%b -d "6 months ago"`
+
+rm -rf $backup_directory/daily/$daily_rotate/*
+rmdir $backup_directory/daily/$daily_rotate/
+
+rm -rf $backup_directory/weekly/$weekly_rotate/*
+rmdir $backup_directory/weekly/$weekly_rotate/
+
+rm -rf $backup_directory/weekly/$monthly_rotate/*
+rmdir $backup_directory/weekly/$monthly_rotate/
+
+
+}

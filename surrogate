@@ -4,6 +4,7 @@
 
 # configs
 source conf/surrogate.conf
+source conf/xtrabackup.conf
 source lib/surrogate.lib
 
 # explain the usage
