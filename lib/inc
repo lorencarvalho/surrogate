@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# surrogate
+# incremental backup function
 
 function incbackup() {
 echo "creating incremental backup"

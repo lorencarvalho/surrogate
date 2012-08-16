@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # surrogate
-# mainloop lib
+# primary library
 
 # get config file(s)
 for config in $(ls $my_root/conf/);

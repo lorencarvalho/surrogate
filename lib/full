@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # surrogate
 # mysql full backup function
 
