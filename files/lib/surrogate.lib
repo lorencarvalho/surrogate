@@ -19,7 +19,7 @@ for library in $(ls $my_root/lib/ | grep -v surrogate.lib );
 if [[ `date +%d` == "01" ]]; 
   then
       full_backup_path="$backup_directory/monthly/full_$now"
-elif [[ `date +%u` == "7" ]];
+elif [[ `date +%u` == "8" ]];
   then
       full_backup_path="$backup_directory/weekly/full_$now"
 else
