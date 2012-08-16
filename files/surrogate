@@ -6,7 +6,7 @@ set -u
 # configs
 source /etc/surrogate/surrogate.conf
 source /etc/surrogate/xtrabackup.conf
-source /usr/local/share/surrogate/lib/surrogate.lib
+source /usr/local/lib/surrogate/lib/surrogate.lib
 
 # explain the usage
 function usage() { 

@@ -4,7 +4,7 @@
 
 # vars
 confdir=/etc/surrogate/
-libdir=/usr/local/share/surrogate
+libdir=/usr/local/lib/surrogate
 
 # describe use
 function usage() { 
@@ -60,13 +60,13 @@ if [[ -h /usr/local/bin/surrogate ]];
     rm /usr/local/bin/surrogate
 fi
 
-ln -s /usr/local/share/surrogate/surrogate /usr/local/bin/surrogate
+ln -s /usr/local/lib/surrogate/surrogate /usr/local/bin/surrogate
 
 /bin/echo -n "]"
 
-echo "installation complete!"
 
 cat <<-EOF
+installation complete!
 
     "Bring back life form. Priority One. All other priorities rescinded."
 
