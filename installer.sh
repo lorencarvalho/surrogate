@@ -17,7 +17,7 @@ exit 1
 }
 
 function fakeprog() {
-  /bin/echo -n "---" && sleep 2
+  /bin/echo -n "---" && sleep 1
 }
 
 echo "installing surrogate"
@@ -28,7 +28,7 @@ if [ "$(whoami)" != "root" ]; then
   exit 1
 fi
 
-/bin/echo -n "["`fakeprog`
+/bin/echo -n "["
 
 if ! [ -d "$confdir" ]; then
   mkdir -p $confdir
@@ -61,5 +61,8 @@ fi
 ln -s /usr/local/share/surrogate/surrogate /usr/local/bin/surrogate
 
 /bin/echo -n "]"
-
+echo " "
 echo "installation complete!"
+echo " "
+echo "Please update the config file in /etc/surrogate/"
+# fin
