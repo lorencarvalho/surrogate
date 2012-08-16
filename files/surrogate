@@ -13,7 +13,7 @@ function usage() {
 cat <<-EOF
 	usage: $0 options
 
-	This script expects some arguments, please oblige!
+	This script must be run with sudo or as root, it also expects some arguments, please oblige!
 
 	OPTIONS:
 
@@ -24,6 +24,10 @@ cat <<-EOF
 EOF
 exit 1
 }
+
+if [ "$(whoami)" != "root" ]; then
+  usage
+fi
 
 # empty vars on initial call, can reuse init() if needed
 function init() {
