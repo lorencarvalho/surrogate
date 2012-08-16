@@ -3,9 +3,9 @@
 # primary library
 
 # get config file(s)
-for config in $(ls $my_root/conf/);
+for config in $(ls /etc/surrogate//);
 	do
-		source $my_root/conf/$config
+		source /etc/surrogate/$config
 	done
 
 # load all libs
