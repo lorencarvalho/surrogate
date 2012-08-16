@@ -53,7 +53,11 @@ cp -R $libdir/conf/* $confdir/
 fakeprog
 
 # symlink to include in path
-rm /usr/local/bin/surrogate
+if [[ -h /usr/local/bin/surrogate ]];
+  then
+    rm /usr/local/bin/surrogate
+fi
+
 ln -s /usr/local/share/surrogate/surrogate /usr/local/bin/surrogate
 
 /bin/echo -n "]"
