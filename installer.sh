@@ -66,6 +66,7 @@ ln -s /usr/local/lib/surrogate/surrogate /usr/local/bin/surrogate
 
 
 cat <<-EOF
+
 installation complete!
 
     "Bring back life form. Priority One. All other priorities rescinded."
