@@ -4,9 +4,9 @@
 set -u
 
 # configs
-source conf/surrogate.conf
-source conf/xtrabackup.conf
-source lib/surrogate.lib
+source /etc/surrogate/surrogate.conf
+source /etc/surrogate/xtrabackup.conf
+source /usr/local/share/surrogate/lib/surrogate.lib
 
 # explain the usage
 function usage() { 
