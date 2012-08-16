@@ -28,7 +28,7 @@ if [ "$(whoami)" != "root" ]; then
   exit 1
 fi
 
-echo "["`fakeprog`
+/bin/echo -n "["`fakeprog`
 
 if ! [ -d "$confdir" ]; then
   mkdir -p $confdir
