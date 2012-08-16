@@ -23,7 +23,7 @@ elif [[ `date +%u` == "7" ]];
   then
       full_backup_path="$backup_directory/weekly/full_$now"
 else
-      full_backup_path="$backup_directory/`date +%a`/full_$now"
+      full_backup_path="$backup_directory/daily/`date +%a`/full_$now"
 fi
 
 # fin
