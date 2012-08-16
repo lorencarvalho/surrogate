@@ -61,8 +61,15 @@ fi
 ln -s /usr/local/share/surrogate/surrogate /usr/local/bin/surrogate
 
 /bin/echo -n "]"
-echo " "
+
 echo "installation complete!"
-echo " "
-echo "Please update the config file in /etc/surrogate/"
+
+cat <<-EOF
+
+    "Bring back life form. Priority One. All other priorities rescinded."
+
+    Make sure to update your MySQL credentials in /etc/surrogate/surrogate.conf
+
+EOF
+
 # fin
