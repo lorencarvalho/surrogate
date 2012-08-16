@@ -13,12 +13,14 @@ function usage() {
 cat <<-EOF
 	usage: $0 options
 
-	This script must be run with sudo or as root, it also expects some arguments, please oblige!
+	This script must be run with sudo or as root, 
+  it also expects some arguments, please oblige!
 
 	OPTIONS:
 
 	-h	Shows this message
-	-b	Backup, either incremental or full, "surrogate -b full" or "surrogate -b inc"
+	-b	Backup, either incremental or full, 
+      "surrogate -b full" or "surrogate -b inc"
 	-r 	Restore, accepts the full path of a restorable directory
 	
 EOF

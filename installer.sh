@@ -30,6 +30,8 @@ fi
 
 /bin/echo -n "["
 
+touch /data/backups/.digest
+
 if ! [ -d "$confdir" ]; then
   mkdir -p $confdir
 fi
