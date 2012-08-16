@@ -22,13 +22,14 @@ cat <<-EOF
 	-r 	Restore, accepts the full path of a restorable directory
 	
 EOF
+exit 1
 }
 
 # empty vars on initial call, can reuse init() if needed
 function init() {
-type=""
-restore=""
-promote=""
+  type=""
+  restore=""
+  promote=""
 }
 
 init
@@ -55,7 +56,7 @@ while getopts "hb:r:" option
 				incbackup
 			else	
 				echo "Please specify full or incremental"
-				exit 1
+				usage
 			fi
 		;;
 		r)
