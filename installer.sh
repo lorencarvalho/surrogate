@@ -62,6 +62,18 @@ fi
 
 ln -s /usr/local/lib/surrogate/surrogate /usr/local/bin/surrogate
 
+mkdir -p /data/backups/monthly
+mkdir -p /data/backups/weekly
+mkdir -p /data/backups/daily/Mon
+mkdir -p /data/backups/daily/Tue
+mkdir -p /data/backups/daily/Wed
+mkdir -p /data/backups/daily/Thu
+mkdir -p /data/backups/daily/Fri
+mkdir -p /data/backups/daily/Sat
+mkdir -p /data/backups/daily/Sun
+mkdir -p /data/log
+mkdir -p /data/tmp
+
 /bin/echo -n "]"
 
 
