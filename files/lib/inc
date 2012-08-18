@@ -12,6 +12,8 @@ innobackupex 				\
 --user=$mysql_user 			\
 --password=$mysql_pass 			\
 --no-timestamp 				\
+--compress \
+--compress-threads=8 \
 --incremental 				\
 --incremental-basedir=$last_backup 	\
 $inc_backup_path 2> $logfile_i

@@ -22,6 +22,11 @@ echo "copying full backup files: " $full_backup
 mkdir $active_backup
 cp -r $full_backup/* $active_backup
 
+for bf in `find $active_backup -iname "*\.qp"`; 
+  do 
+        qpress -d $bf $(dirname $bf) && rm -f $bf; 
+done
+
 echo "preparing full backup..."
 innobackupex 			\
 --ibbackup=xtrabackup_55 	\
@@ -50,6 +55,11 @@ fi
 echo "copying incremental backup: " $incremental_backup
 mkdir $active_incremental
 cp -r $incremental_backup/* $active_incremental
+
+for bf in `find $active_incremental -iname "*\.qp"`; 
+  do 
+        qpress -d $bf $(dirname $bf) && rm -f $bf; 
+done
 
 find $incremental_backup -name .delta -empty -maxdepth 2 -exec rm {} \;
 
