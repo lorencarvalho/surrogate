@@ -6,10 +6,12 @@ _Bring back life form. Priority One. All other priorities rescinded._
 
 ----
 
-### System Requirements
+### Prerequisites
 
-- Percona 5.5 (Reccomended, for older versions adjust the "binversion" configuration in xtrabackup.conf)
-- Percona Xtrabackup 2.0
+- Percona 5.5
+-- Functionality for older version of MySQL is on the TODO list
+- Percona Xtrabackup 2.0.1 or later
+- Ample disk space (even with compression backups are only 2:1 ratio)
 
 #### Usage
 
@@ -20,4 +22,34 @@ _Bring back life form. Priority One. All other priorities rescinded._
 --	Accepts either "full" or "inc" as an argument
 - -r 	Restore, accepts the full path of a restorable directory
 
+#### Configuration
 
+Main configuration file
+- /etc/surrogate/surrogate.conf
+
+Xtrabackup tuning configuration (TODO)
+- /etc/surrogate/xtrabackup.conf
+
+#### Retention directory tree 
+
+ |-- backups
+ |   |-- daily
+ |   |   |-- Fri
+ |   |   |-- Mon
+ |   |   |-- Sat
+ |   |   |-- Sun
+ |   |   |-- Thu
+ |   |   |-- Tue
+ |   |   `-- Wed
+ |   |-- monthly
+ |   `-- weekly
+ |-- log
+ |   `-- bin
+ |-- mysql
+ |-- tmp
+
+#### Default rotation policy (TODO: configurable in surrogate.conf)
+
+- 7 days
+- 4 weeks
+- 6 months
