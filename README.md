@@ -32,6 +32,7 @@ Xtrabackup tuning configuration (TODO)
 
 #### Retention directory tree 
 
+    /data
     |-- backups
     |   |-- daily
     |   |   |-- Fri
