@@ -30,8 +30,6 @@ fi
 
 /bin/echo -n "["
 
-touch /data/backups/.digest
-
 if ! [ -d "$confdir" ]; then
   mkdir -p $confdir
 fi
@@ -73,6 +71,8 @@ mkdir -p /data/backups/daily/Sat
 mkdir -p /data/backups/daily/Sun
 mkdir -p /data/log
 mkdir -p /data/tmp
+chown -R mysql:mysql /data
+touch /data/backups/.digest
 
 /bin/echo -n "]"
 
