@@ -8,8 +8,11 @@ _Bring back life form. Priority One. All other priorities rescinded._
 
 ### Prerequisites
 
+- Qpress 
+    wget http://www.quicklz.com/qpress-11-linux-x64.tar 
+    sudo mv qpress /usr/bin/
 - Percona 5.5
--- Functionality for older version of MySQL is on the TODO list
+- - Functionality for older version of MySQL is on the TODO list
 - Percona Xtrabackup 2.0.1 or later
 - Ample disk space (even with compression backups are only 2:1 ratio)
 
