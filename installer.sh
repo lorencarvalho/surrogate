@@ -71,6 +71,7 @@ mkdir -p /data/backups/daily/Sat
 mkdir -p /data/backups/daily/Sun
 mkdir -p /data/log
 mkdir -p /data/tmp
+mkdir -p /log/surrogate
 chown -R mysql:mysql /data
 touch /data/backups/.digest
 
