@@ -53,9 +53,9 @@ cp -r $incremental_backup/* $active_incremental
 
 find $incremental_backup -name .delta -empty -maxdepth 2 -exec rm {} \;
 
-echo "preparing incremetal backup..."
+echo "preparing incremental backup..."
 innobackupex 			\
---ibbackup=xtrabackup_55 	\		
+--ibbackup=xtrabackup_55 	\
 --parallel=4 			\
 --user=$mysql_user 		\
 --password=$mysql_pass 		\
