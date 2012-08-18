@@ -32,21 +32,21 @@ Xtrabackup tuning configuration (TODO)
 
 #### Retention directory tree 
 
- |-- backups
- |   |-- daily
- |   |   |-- Fri
- |   |   |-- Mon
- |   |   |-- Sat
- |   |   |-- Sun
- |   |   |-- Thu
- |   |   |-- Tue
- |   |   `-- Wed
- |   |-- monthly
- |   `-- weekly
- |-- log
- |   `-- bin
- |-- mysql
- |-- tmp
+    |-- backups
+    |   |-- daily
+    |   |   |-- Fri
+    |   |   |-- Mon
+    |   |   |-- Sat
+    |   |   |-- Sun
+    |   |   |-- Thu
+    |   |   |-- Tue
+    |   |   `-- Wed
+    |   |-- monthly
+    |   `-- weekly
+    |-- log
+    |   `-- bin
+    |-- mysql
+    |-- tmp
 
 #### Default rotation policy (TODO: configurable in surrogate.conf)
 
