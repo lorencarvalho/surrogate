@@ -6,7 +6,7 @@ function rotate_backups() {
 set -u
 
 # removing old dirs
-# daily_rotate=`date +%a -d "7 days ago"`
+# daily_rotate=`date +%a -d "8 days ago"`
 # weekly_rotate=`date +%Y-%m -d "6 weeks ago"`
 # monthly_rotate=`date +%b -d "6 months ago"`
 
