@@ -7,7 +7,7 @@ echo "restoring backup"
 
 if [ -z "$restore" ];
   then
-    restore=/data/backups/.digest
+    restore=$backup_directory/backups/.digest
 fi
 
 if [ -d $active_backup ];

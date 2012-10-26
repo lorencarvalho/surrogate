@@ -3,17 +3,13 @@
 # backup rotation/retention
 
 function rotate_backups() {
-set -u
+  set -u
 
-# removing old dirs
-# daily_rotate=`date +%a -d "8 days ago"`
-# weekly_rotate=`date +%Y-%m -d "6 weeks ago"`
-# monthly_rotate=`date +%b -d "6 months ago"`
-
+  # removing old dirs
+  # daily_rotate=`date +%a -d "8 days ago"`
+  # weekly_rotate=`date +%Y-%m -d "6 weeks ago"`
+  # monthly_rotate=`date +%b -d "6 months ago"`
   rm -rf $backup_directory/daily/$daily_rotate/*
-
   rm -rf $backup_directory/weekly/$weekly_rotate*
-
   rm -rf $backup_directory/monthly/$monthly_rotate*
-
 }

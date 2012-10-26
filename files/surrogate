@@ -1,12 +1,22 @@
 #!/bin/bash
 # surrogate
 # loren carvalho, 2012
+set -e
 set -u
+
+if [ "$(whoami)" != "root" ]; then
+  if [ -f `which sudo` ]; then
+    sudo $0 "$*"
+    exit $?
+  else
+    usage
+  fi
+fi
 
 # configs
 source /etc/surrogate/surrogate.conf
 source /etc/surrogate/xtrabackup.conf
-source /usr/local/lib/surrogate/lib/surrogate.lib
+source /usr/local/lib/surrogate/lib/surrogate
 
 # explain the usage
 function usage() { 
@@ -26,10 +36,6 @@ cat <<-EOF
 EOF
 exit 1
 }
-
-if [ "$(whoami)" != "root" ]; then
-  usage
-fi
 
 # empty vars on initial call, can reuse init() if needed
 function init() {

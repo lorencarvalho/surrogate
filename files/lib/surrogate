@@ -9,7 +9,7 @@ for config in $(ls /etc/surrogate//);
 	done
 
 # load all libs
-for library in $(ls $my_root/lib/ | grep -v surrogate.lib );
+for library in $(ls $my_root/lib/ | grep -v surrogate );
 	do
 		source $my_root/lib/$library
 	done
