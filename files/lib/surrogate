@@ -8,14 +8,9 @@ for config in $(ls /etc/surrogate//);
 		source /etc/surrogate/$config
 	done
 
-# load all libs
-for library in $(ls $my_root/lib/ | grep -v surrogate );
-	do
-		source $my_root/lib/$library
-	done
+source $my_root/lib/rotate
 
 # determine the location of todays backup (for retention)
-
 if [[ `date +%d` == "01" ]]; 
   then
       full_backup_path="$backup_directory/monthly/full_$now"

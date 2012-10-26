@@ -6,7 +6,7 @@
 if [ "$(whoami)" != "root" ]; then
   if [ -f `which sudo` ]; then
     # no dude, need to sudo this ma
-    sudo $0 "$*"
+    sudo $0 "$@"
     exit $?
   else
     # oh snap, dont gots the sudo powa
