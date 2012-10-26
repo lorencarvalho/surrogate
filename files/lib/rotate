@@ -5,7 +5,7 @@
 function rotate_backups() {
   set -u
 
-  find $backup_directory/daily -not -newermt $daily_retention | xargs rm -rf
+  find $backup_directory/daily -mindepth 2 -not -newermt $daily_retention | xargs rm -rf
   find $backup_directory/weekly -not -newermt $weekly_retention | xargs rm -rf
   find $backup_directory/monthly -not -newermt $monthly_retention | xargs rm -rf
 }
