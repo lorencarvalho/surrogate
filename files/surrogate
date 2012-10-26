@@ -3,10 +3,26 @@
 # loren carvalho, 2012
 set -u
 
+which innobackupex 2> /dev/null
+if [ $? -gt 0 ]; then
+  echo "Can not find innobackupex!"
+  echo "Please install Percona XtraBackup and try again"
+  exit 1
+fi
+
+if [ "$(whoami)" != "root" ]; then
+  if [ -f `which sudo` ]; then
+    sudo $0 "$@"
+    exit $?
+  else
+    usage
+  fi
+fi
+
 # configs
 source /etc/surrogate/surrogate.conf
 source /etc/surrogate/xtrabackup.conf
-source /usr/local/lib/surrogate/lib/surrogate.lib
+source /usr/local/lib/surrogate/lib/surrogate
 
 # explain the usage
 function usage() { 
@@ -27,10 +43,6 @@ EOF
 exit 1
 }
 
-if [ "$(whoami)" != "root" ]; then
-  usage
-fi
-
 # empty vars on initial call, can reuse init() if needed
 function init() {
   type=""
@@ -48,29 +60,30 @@ rotate_backups
 
 # get input
 while getopts "hb:r:" option 
-	do
-		case $option in
-		h)
-			usage
-			exit 1
-		;;
-		b)
-			type=$OPTARG
-			if [[ "$type" == "full" ]]; then
-				fullbackup
-			elif [[ "$type" == "inc" ]]; then
-				incbackup
-			else	
-				echo "Please specify full or incremental"
-				usage
-			fi
-		;;
-		r)
-			restore=$OPTARG
-			restorebackup
-		;;
-		esac
-	done
+do
+  case $option in
+  h)
+    usage
+  ;;
+  b)
+    type=$OPTARG
+    if [[ "$type" == "full" ]]; then
+      source $my_root/lib/actions/full
+    elif [[ "$type" == "inc" ]]; then
+      source $my_root/lib/actions/inc
+    else	
+      echo "Please specify full or incremental"
+      usage
+    fi
+  ;;
+  r)
+    restore=$OPTARG
+    source $my_root/lib/actions/restore
+  ;;
+  esac
+done
 
+# Perform the loaded action
+perform_action
 
 # fin

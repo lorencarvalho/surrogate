@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# surrogate
+# mysql full backup function
+
+function perform_action() {
+  echo "creating full backup"
+
+  innobackupex 				\
+  --ibbackup=xtrabackup_55 		\
+  --parallel=8				\
+  --user=$mysql_user 			\
+  --password=$mysql_pass 			\
+  --no-timestamp 				\
+  --compress \
+  --compress-threads=8 \
+  $full_backup_path 2> $logfile_f
+
+  echo "checking if the backup completed sucsessfully"
+  if ! tail $logfile_f -n 1 | grep completed.OK
+  then
+    rm -R $full_backup_path
+    echo "\nERROR: backup failed! (log: "$logfile_f")"
+    exit 1
+  fi
+
+  echo $full_backup_path > $backup_directory/.digest
+  echo "Backup Completed OK!"
+}
+
+# fin
