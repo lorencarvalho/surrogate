@@ -22,7 +22,9 @@ _Bring back life form. Priority One. All other priorities rescinded._
 - -h	Usage
 - -b	Performs a backup, either incremental or full depending on the argument you supply, for example: "surrogate -b full"
 --	Accepts either "full" or "inc" as an argument
-- -r 	Restore, accepts the full path of a restorable directory
+- -r  Restore using default digest location
+- -c  Restore, accepts a file containing a list of directories to restore.
+
 
 #### Configuration
 
@@ -51,8 +53,17 @@ Xtrabackup tuning configuration (TODO)
     |-- mysql
     |-- tmp
 
-#### Default rotation policy (TODO: configurable in surrogate.conf)
+#### Default rotation policy (configurable in surrogate.conf)
 
 - 7 days
 - 4 weeks
 - 6 months
+
+#### Authors
+
+- Loren Carvalho
+- Jesse R. Adams
+
+#### License
+
+GPLv3
