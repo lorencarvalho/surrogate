@@ -1,9 +1,34 @@
 #!/bin/bash
 # surrogate
 # loren carvalho, 2012
+
+# explain the usage
+function usage() { 
+cat <<-EOF
+	usage: $0 options
+
+	This script must be run with sudo or as root, 
+  it also expects some arguments, please oblige!
+
+	OPTIONS:
+
+	-h	Shows this message
+	-b	Backup, either incremental or full, 
+      "surrogate -b full" or "surrogate -b inc"
+	-r 	Restore using default digest location
+	-c 	Restore, accepts a file containing a list of directories to restore.
+	
+EOF
+exit 1
+}
+
+# if there is no input, barf
+[[ -z "$1" ]] && { usage; }
+
 set -u
 
-which innobackupex 2> /dev/null
+which innobackupex &> /dev/null
+
 if [ $? -gt 0 ]; then
   echo "Can not find innobackupex!"
   echo "Please install Percona XtraBackup and try again"
@@ -24,25 +49,6 @@ source /etc/surrogate/surrogate.conf
 source /etc/surrogate/xtrabackup.conf
 source /usr/local/lib/surrogate/lib/surrogate
 
-# explain the usage
-function usage() { 
-cat <<-EOF
-	usage: $0 options
-
-	This script must be run with sudo or as root, 
-  it also expects some arguments, please oblige!
-
-	OPTIONS:
-
-	-h	Shows this message
-	-b	Backup, either incremental or full, 
-      "surrogate -b full" or "surrogate -b inc"
-	-r 	Restore, accepts the full path of a restorable directory
-	
-EOF
-exit 1
-}
-
 # empty vars on initial call, can reuse init() if needed
 function init() {
   type=""
@@ -55,11 +61,8 @@ init
 # quietly run the rotation function
 rotate_backups
 
-# if there is no input, barf
-[[ ! $1 ]] && { usage; }
-
 # get input
-while getopts "hb:r:" option 
+while getopts "hb:rc:" option 
 do
   case $option in
   h)
@@ -77,13 +80,30 @@ do
     fi
   ;;
   r)
+    restore="$backup_directory/.digest"
+    echo $restore
+ 
+    if [ -d "$restore" ];then
+      echo "Argument is not a directory. Aborting!"
+      exit 1
+    fi
+
+    source $my_root/lib/actions/restore
+  ;;
+  c)
     restore=$OPTARG
+ 
+    if [ -d "$restore" ];then
+      echo "Argument is not a directory. Aborting!"
+      exit 1
+    fi
+
     source $my_root/lib/actions/restore
   ;;
   esac
 done
 
-# Perform the loaded action
+# Check vars & perform the loaded action
 perform_action
 
 # fin
