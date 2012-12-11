@@ -2,8 +2,25 @@
 # surrogate
 # restoration function
 
+function locate_mysql_commands(){
+  # System V
+  if [ -f "/etc/init.d/mysql" ]; then
+    startup_command="/etc/init.d/mysql start"
+    shutdown_command="/etc/init.d/mysql stop"
+  # System D
+  elif [ -f "/usr/bin/systemctl" ]; then
+    startup_command="/usr/bin/systemctl start mysqld"
+    shutdown_command="/usr/bin/systemctl stop mysqld"
+  else
+    echo "Can't determine the mysql startup/shutdown commands!"
+    exit 1
+  fi
+}
+
 function perform_action() {
   echo "restoring backup"
+
+  locate_mysql_commands
 
   if [ -z "$restore" ];
   then
@@ -36,7 +53,7 @@ function perform_action() {
   --apply-log 			\
   --redo-only $active_backup 2> $logfile_r
 
-  # see if the apply-log completed sucsessfully
+  # see if the apply-log completed successfully
   if ! tail $logfile_r -n 1 | grep completed.OK
   then
     echo "\nERROR: restore failed! (log: "$logfile_r")"
@@ -75,7 +92,7 @@ function perform_action() {
 
   rm -R $active_incremental
 
-  echo "check if the apply incremental completed sucsessfully"
+  echo "check if the apply incremental completed successfully"
   if ! tail $logfile_r -n 1 | grep completed.OK
   then
     echo "\nERROR: restore failed! (log: "$logfile_r")"
@@ -92,7 +109,7 @@ function perform_action() {
   --password=$mysql_pass 		\
   --apply-log $active_backup 2>> $logfile_r
 
-  echo "check if the apply log completed sucsessfully"
+  echo "check if the apply log completed successfully"
   if ! tail $logfile_r -n 1 | grep completed.OK
   then
     echo "\nERROR: restore failed! (log: "$logfile_r")"
@@ -101,7 +118,8 @@ function perform_action() {
   fi
 
   echo "stop mysql..."
-  /etc/init.d/mysql stop
+  $shutdown_command
+
   echo "moving mysql data files..."
   rm -rf $mysql_sanity_path
   mv -f $mysql_data_path $mysql_sanity_path
@@ -126,7 +144,7 @@ function perform_action() {
   rmdir $active_backup
 
   echo "restoration almost complete, starting mysql..."
-  /etc/init.d/mysql start
+  $startup_command
 
   echo "Restore Completed OK!"
 }
