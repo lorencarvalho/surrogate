@@ -32,7 +32,8 @@ function prompt_user(){
 
 }
 
-prompt_user mysql_user 'MySQL User' 'mysql'
+prompt_user mysql_user_system 'MySQL System User' 'mysql'
+prompt_user mysql_user_db 'MySQL Database User' 'root'
 prompt_user datadir 'Directory to store data' '/data'
 prompt_user confdir 'Directory to store configs' '/etc/surrogate'
 prompt_user libdir 'Directory to store libs' '/usr/local/lib/surrogate'
@@ -69,6 +70,7 @@ rsync -a ./files/ $libdir/
 cp -R $libdir/conf/* $confdir/
 chmod 600 $confdir/surrogate.conf
 sed -i "s|/data|$datadir|" $confdir/surrogate.conf
+sed -i "s|root|$mysql_user_db|" $confdir/surrogate.conf
 sed -i "s|/data|$datadir|" $libdir/lib/surrogate
 sed -i "s|/var/log/surrogate|$logdir|" $confdir/surrogate.conf
 sed -i "s|/var/log/surrogate|$logdir|" $libdir/surrogate 
@@ -97,7 +99,7 @@ mkdir -p $datadir/backups/daily/Sun
 mkdir -p $datadir/log
 mkdir -p $datadir/tmp
 mkdir -p $logdir 
-chown -R $mysql_user:$mysql_user $datadir
+chown -R $mysql_user_system:$mysql_user_system $datadir
 touch $datadir/backups/.digest
 
 /bin/echo -ne "Installing Surrogate\t\t[##########] 100%\r"
@@ -108,7 +110,7 @@ Installation complete!
 
     "Bring back life form. Priority One. All other priorities rescinded."
 
-    Make sure to update your MySQL credentials in $configdir/surrogate.conf
+    Make sure to update your MySQL credentials in $confdir/surrogate.conf
 
 EOF
 
