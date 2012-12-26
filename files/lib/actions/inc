@@ -23,10 +23,12 @@ function perform_action() {
   then
     rm -R $inc_backup_path
     echo "\nERROR: backup failed! (log: "$logfile_i")"
+    echo "status=1" > $backup_directory/backup.status
     exit 1
   fi
 
   echo $inc_backup_path >> $backup_directory/.digest
+  echo "status=0" > $backup_directory/backup.status
   echo "Backup Completed OK!"
 }
 
