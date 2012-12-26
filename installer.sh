@@ -40,6 +40,7 @@ prompt_user libdir 'Directory to store libs' '/usr/local/lib/surrogate'
 prompt_user logdir 'Directory to store surrogate logs' '/var/log/surrogate' 
 prompt_user cron_h 'Hour to run full backups at' '8'
 prompt_user cron_m 'Minute to run full backups at' '0'
+prompt_user install_qpress 'Should qpress be installed? [Y/N]' 'N'
 
 # describe use
 function usage() { 
@@ -104,10 +105,12 @@ mkdir -p $logdir
 chown -R $mysql_user_system:$mysql_user_system $datadir
 touch $datadir/backups/.digest
 
-echo installing qpress
-wget http://www.quicklz.com/qpress-11-linux-x64.tar
-tar xf qpress-11-linux-x64.tar
-mv qpress /usr/local/bin/
+if [ "$install_qpress" == "Y" ]; then
+  echo installing qpress
+  wget http://www.quicklz.com/qpress-11-linux-x64.tar
+  tar xf qpress-11-linux-x64.tar
+  mv qpress /usr/local/bin/
+fi
 
 echo adding cron entry
 echo >> /var/spool/cron/root
