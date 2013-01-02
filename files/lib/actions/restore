@@ -18,7 +18,7 @@ function locate_mysql_commands(){
 }
 
 function perform_action() {
-  port=$1
+  instance=$1
   
   if [ -z "$socket" ]; then
     socket_variable=mysql_socket_${instance}
