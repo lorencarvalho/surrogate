@@ -10,15 +10,16 @@ for config in $(ls /etc/surrogate//);
 
 source $my_root/lib/rotate
 
-# determine the location of todays backup (for retention)
-if [[ `date +%d` == "01" ]]; 
-  then
-      full_backup_path="$backup_directory/monthly/full_$now"
-elif [[ `date +%u` == "7" ]];
-  then
-      full_backup_path="$backup_directory/weekly/full_$now"
-else
-      full_backup_path="$backup_directory/daily/`date +%a`/full_$now"
-fi
-
+function determine_full_backup_path(){
+  # determine the location of todays backup (for retention)
+  if [[ `date +%d` == "01" ]]; 
+    then
+        full_backup_path="$backup_directory/monthly/full_$now"
+  elif [[ `date +%u` == "7" ]];
+    then
+        full_backup_path="$backup_directory/weekly/full_$now"
+  else
+        full_backup_path="$backup_directory/daily/`date +%a`/full_$now"
+  fi
+}
 # fin

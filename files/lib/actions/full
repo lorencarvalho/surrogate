@@ -1,8 +1,19 @@
 #!/usr/bin/env bash
 # surrogate
 # mysql full backup function
-
 function perform_action() {
+  instance=$1
+
+  if [ -z "$socket" ]; then
+    socket_variable=mysql_socket_${instance}
+    socket=${!socket_variable}
+  fi
+
+  determine_full_backup_path
+  if [ ! -d `dirname $full_backup_path` ]; then
+    mkdir -p `dirname $full_backup_path`
+  fi
+
   echo "creating full backup"
 
   innobackupex 				\
@@ -13,6 +24,8 @@ function perform_action() {
   --no-timestamp 				\
   --compress \
   --compress-threads=8 \
+  --socket=$socket \
+  --defaults-group="mysqld$instance" \
   $full_backup_path 2> $logfile_f
 
   echo "checking if the backup completed sucsessfully"

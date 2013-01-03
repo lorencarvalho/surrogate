@@ -3,6 +3,13 @@
 # incremental backup function
 
 function perform_action() {
+  instance=$1
+  
+  if [ -z "$socket" ]; then
+    socket_variable=mysql_socket_${instance}
+    socket=${!socket_variable}
+  fi
+
   echo "creating incremental backup"
 
   #perform incremental backup from where the last backup stoped
@@ -16,6 +23,8 @@ function perform_action() {
   --compress-threads=8 \
   --incremental 				\
   --incremental-basedir=$last_backup 	\
+  --socket=$socket \
+  --defaults-group="mysqld$instance" \
   $inc_backup_path 2> $logfile_i
 
   echo "checking if the backup completed sucsessfully"
