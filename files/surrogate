@@ -61,6 +61,18 @@ init
 # quietly run the rotation function
 rotate_backups
 
+function rebuild_configs_for_instance(){
+  instance=$1
+  echo "REBUILDING CONFIGS FOR $instance"
+  mysql_data_path="$original_data_path/$instance"
+  backup_directory="$original_backup_dir/$instance"
+  mysql_collapse_path="$original_collapse_path/$instance"
+  mysql_sanity_path="$original_sanity_path/$instance"
+  inc_backup_path="$backup_directory/$today/inc_$now"
+  last_backup=`tail -n1 $backup_directory/.digest`
+  restore="$backup_directory/.digest"
+}
+
 # get input
 while getopts "hb:rc:" option 
 do
@@ -80,30 +92,35 @@ do
     fi
   ;;
   r)
-    restore="$backup_directory/.digest"
-    echo $restore
- 
-    if [ -d "$restore" ];then
-      echo "Argument is not a directory. Aborting!"
-      exit 1
-    fi
-
     source $my_root/lib/actions/restore
   ;;
   c)
     restore=$OPTARG
- 
-    if [ -d "$restore" ];then
-      echo "Argument is not a directory. Aborting!"
-      exit 1
-    fi
-
     source $my_root/lib/actions/restore
   ;;
   esac
 done
 
+count=0
+for instance in $mysql_instances; do
+  count=`expr $count + 1` 
+done
+
 # Check vars & perform the loaded action
-perform_action
+if [ $count -gt 1 ]; then
+  original_data_path=$mysql_data_path
+  original_backup_dir=$backup_directory
+  original_collapse_path=$mysql_collapse_path
+  original_sanity_path=$mysql_sanity_path
+
+  for instance in $mysql_instances; do
+    echo "Processing instance: $instance"
+    rebuild_configs_for_instance $instance
+    perform_action $instance
+  done
+else
+  socket=$mysql_socket
+  perform_action $mysql_instances
+fi
 
 # fin
