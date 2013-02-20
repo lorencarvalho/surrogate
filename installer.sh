@@ -1,15 +1,10 @@
 #/usr/bin/env bash
-# surrogate
-# installer
 
-# hey bro, are you root?
 if [ "$(whoami)" != "root" ]; then
   if [ -f `which sudo` ]; then
-    # no dude, need to sudo this ma
     sudo $0 "$@"
     exit $?
   else
-    # oh snap, dont gots the sudo powa
     usage
     exit 1
   fi
@@ -127,5 +122,3 @@ Installation complete!
     Make sure to update your MySQL credentials in $confdir/surrogate.conf
 
 EOF
-
-# fin
