@@ -65,5 +65,4 @@ Xtrabackup tuning configuration (TODO)
 - Jesse R. Adams
 
 #### License
-
 GPLv3
