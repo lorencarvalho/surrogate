@@ -92,13 +92,8 @@ ln -s /usr/local/lib/surrogate/surrogate /usr/local/bin/surrogate
 
 mkdir -p $datadir/backups/monthly
 mkdir -p $datadir/backups/weekly
-mkdir -p $datadir/backups/daily/Mon
-mkdir -p $datadir/backups/daily/Tue
-mkdir -p $datadir/backups/daily/Wed
-mkdir -p $datadir/backups/daily/Thu
-mkdir -p $datadir/backups/daily/Fri
-mkdir -p $datadir/backups/daily/Sat
-mkdir -p $datadir/backups/daily/Sun
+mkdir -p $datadir/backups/daily
+mkdir -p $datadir/backups/daily/{Mon,Tue,Wed,Thu,Fri,Sat,Sun}
 mkdir -p $datadir/log
 mkdir -p $datadir/tmp
 mkdir -p $logdir 
