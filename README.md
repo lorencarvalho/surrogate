@@ -60,8 +60,8 @@ Xtrabackup tuning configuration (for future versions, not currently used)
 
 #### Authors
 
-- Loren Carvalho
-- Jesse R. Adams
+- [Loren Carvalho](https://github.com/sixninetynine)
+- [Jesse R. Adams](https://github.com/jesseadams)
 
 #### License
 
