@@ -8,16 +8,15 @@ _Bring back life form. Priority One. All other priorities rescinded._
 
 ### Prerequisites
 
-- Qpress [Download, extract & mv to /usr/bin](http://www.quicklz.com/qpress-11-linux-x64.tar)
+- Qpress, included in the installer, otherwise you can get a copy [here.](http://www.quicklz.com/qpress-11-linux-x64.tar)
 
-- Percona 5.5
- - Functionality for older version of MySQL is on the TODO list
+- Percona 5.5+
 - Percona Xtrabackup 2.0.1 or later
 - Ample disk space (even with compression backups are only 2:1 ratio)
 
 #### Usage
 
-`sh surrogate -<switch> <argument>`
+`sh surrogate -<flag> <argument>`
 
 - -h	Usage
 - -b	Performs a backup, either incremental or full depending on the argument you supply, for example: "surrogate -b full"
@@ -31,12 +30,12 @@ _Bring back life form. Priority One. All other priorities rescinded._
 Main configuration file
 - /etc/surrogate/surrogate.conf
 
-Xtrabackup tuning configuration (TODO)
+Xtrabackup tuning configuration (for future versions, not currently used)
 - /etc/surrogate/xtrabackup.conf
 
 #### Retention directory tree 
 
-    /data
+    /data (customizable data directory)
     |-- backups
     |   |-- daily
     |   |   |-- Fri
@@ -50,7 +49,7 @@ Xtrabackup tuning configuration (TODO)
     |   `-- weekly
     |-- log
     |   `-- bin
-    |-- mysql
+    |-- mysql (or your my.cnf datadir)
     |-- tmp
 
 #### Default rotation policy (configurable in surrogate.conf)
