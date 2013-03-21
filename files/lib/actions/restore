@@ -7,6 +7,10 @@ function locate_mysql_commands(){
   if [ -f "/etc/init.d/mysql" ]; then
     startup_command="/etc/init.d/mysql start"
     shutdown_command="/etc/init.d/mysql stop"
+  # System V - quick dirty mysqld fix
+  elif [ -f "/etc/init.d/mysqld" ]; then
+    startup_command="/etc/init.d/mysqld start"
+    shutdown_command="/etc/init.d/mysqld stop"
   # System D
   elif [ -f "/usr/bin/systemctl" ]; then
     startup_command="/usr/bin/systemctl start mysqld"
