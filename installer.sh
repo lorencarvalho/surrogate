@@ -30,6 +30,7 @@ function prompt_user(){
 prompt_user mysql_user_system 'MySQL System User' 'mysql'
 prompt_user mysql_user_db 'MySQL Database User' 'root'
 prompt_user datadir 'Directory to store data' '/data'
+prompt_user backup_directory 'Directory to store backups' '/data/backups'
 prompt_user confdir 'Directory to store configs' '/etc/surrogate'
 prompt_user libdir 'Directory to store libs' '/usr/local/lib/surrogate'
 prompt_user logdir 'Directory to store surrogate logs' '/var/log/surrogate' 
@@ -67,8 +68,10 @@ rsync -a ./files/ $libdir/
 # configure it
 cp -R $libdir/conf/* $confdir/
 chmod 600 $confdir/surrogate.conf
+
 sed -i "s|/data|$datadir|" $confdir/surrogate.conf
 sed -i "s|=root|=$mysql_user_db|" $confdir/surrogate.conf
+sed -i "s|/data/backups|$backup_directory|" $libdir/lib/surrogate
 sed -i "s|/data|$datadir|" $libdir/lib/surrogate
 sed -i "s|/var/log/surrogate|$logdir|" $confdir/surrogate.conf
 sed -i "s|/var/log/surrogate|$logdir|" $libdir/surrogate 
@@ -85,18 +88,19 @@ fi
 
 ln -s /usr/local/lib/surrogate/surrogate /usr/local/bin/surrogate
 
-mkdir -p $datadir/backups/monthly
-mkdir -p $datadir/backups/weekly
-mkdir -p $datadir/backups/daily/Mon
-mkdir -p $datadir/backups/daily/Tue
-mkdir -p $datadir/backups/daily/Wed
-mkdir -p $datadir/backups/daily/Thu
-mkdir -p $datadir/backups/daily/Fri
-mkdir -p $datadir/backups/daily/Sat
-mkdir -p $datadir/backups/daily/Sun
-mkdir -p $datadir/log
-mkdir -p $datadir/tmp
-mkdir -p $logdir 
+# these should be created during backup runs
+#mkdir -p $datadir/backups/monthly
+#mkdir -p $datadir/backups/weekly
+#mkdir -p $datadir/backups/daily/Mon
+#mkdir -p $datadir/backups/daily/Tue
+#mkdir -p $datadir/backups/daily/Wed
+#mkdir -p $datadir/backups/daily/Thu
+#mkdir -p $datadir/backups/daily/Fri
+#mkdir -p $datadir/backups/daily/Sat
+#mkdir -p $datadir/backups/daily/Sun
+#mkdir -p $datadir/log
+#mkdir -p $datadir/tmp
+#mkdir -p $logdir 
 #can break mysql during installation
 #chown -R $mysql_user_system:$mysql_user_system $datadir
 touch $datadir/backups/.digest
