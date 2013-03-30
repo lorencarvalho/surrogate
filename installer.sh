@@ -97,7 +97,8 @@ mkdir -p $datadir/backups/daily/Sun
 mkdir -p $datadir/log
 mkdir -p $datadir/tmp
 mkdir -p $logdir 
-chown -R $mysql_user_system:$mysql_user_system $datadir
+#can break mysql during installation
+#chown -R $mysql_user_system:$mysql_user_system $datadir
 touch $datadir/backups/.digest
 
 if [ "$install_qpress" == "Y" ]; then
