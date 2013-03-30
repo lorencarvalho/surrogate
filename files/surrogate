@@ -59,7 +59,7 @@ function init() {
 init
 
 # quietly run the rotation function
-auto_rotate && rotate_backups
+$auto_rotate && rotate_backups
 
 function rebuild_configs_for_instance(){
   instance=$1
