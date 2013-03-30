@@ -11,9 +11,9 @@ function perform_action() {
 
 # dont need
 #  determine_full_backup_path
-  if [ ! -d `dirname $full_backup_path` ]; then
-    mkdir -p `dirname $full_backup_path`
-  fi
+#  if [ ! -d `dirname $full_backup_path` ]; then
+#    mkdir -p `dirname $full_backup_path`
+#  fi
 
 
 runbackup () {
@@ -48,3 +48,4 @@ fi
 runbackup daily
 
 # fin
+}
