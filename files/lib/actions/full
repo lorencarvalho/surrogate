@@ -33,12 +33,12 @@ function perform_action() {
   then
     rm -R $full_backup_path
     echo "\nERROR: backup failed! (log: "$logfile_f")"
-    echo "status=1" > $backup_directory/backup-full.status
+    echo "status=1" > /tmp/backup-full.status
     exit 1
   fi
 
   echo $full_backup_path > $backup_directory/.digest
-  echo "status=0" > $backup_directory/backup-full.status
+  echo "status=0" > /tmp/backup-full.status
   echo "Backup Completed OK!"
 }
 
