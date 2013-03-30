@@ -15,7 +15,7 @@ function perform_action() {
 #    mkdir -p `dirname $full_backup_path`
 #  fi
 
-
+dump_err=0
 runbackup () {
 	type=$1
 	mkdir -vp $backup_directory/$type/$today_iso_8601
