@@ -71,7 +71,7 @@ chmod 600 $confdir/surrogate.conf
 
 sed -i "s|/data|$datadir|" $confdir/surrogate.conf
 sed -i "s|=root|=$mysql_user_db|" $confdir/surrogate.conf
-sed -i "s|/data/backups|$backup_directory|" $libdir/lib/surrogate
+sed -i "s|/data/backups|$backup_directory|" $confdir/surrogate.conf
 sed -i "s|/data|$datadir|" $libdir/lib/surrogate
 sed -i "s|/var/log/surrogate|$logdir|" $confdir/surrogate.conf
 sed -i "s|/var/log/surrogate|$logdir|" $libdir/surrogate 
