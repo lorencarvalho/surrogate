@@ -3,9 +3,10 @@
 # backup rotation/retention
 
 function rotate_backups() {
-	set -u
-	find $backup_directory/daily/ -mindepth 2 -type f -mtime +${daily_retention} -exec rm {} \;
-	find $backup_directory/weekly/ -type f -mtime +${weekly_retention} -exec rm {} \;
-	find $backup_directory/monthly/ -type f -mtime +${monthly_retention} -exec rm {} \;
+#	set -u
+	echo "Rotating old backups"
+	find $backup_directory/daily/ -type d -mtime +${daily_retention} -exec rm -fvR {} \;
+	find $backup_directory/weekly/ -type d -mtime +${weekly_retention} -exec rm -fvR {} \;
+	find $backup_directory/monthly/ -type d -mtime +${monthly_retention} -exec rm -fvR {} \;
 
 }

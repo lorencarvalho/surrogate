@@ -59,7 +59,7 @@ function init() {
 init
 
 # quietly run the rotation function
-rotate_backups
+$auto_rotate && rotate_backups
 
 function rebuild_configs_for_instance(){
   instance=$1
@@ -86,6 +86,8 @@ do
       source $my_root/lib/actions/full
     elif [[ "$type" == "inc" ]]; then
       source $my_root/lib/actions/inc
+    elif [[ "$type" == "dump" ]]; then
+      source $my_root/lib/actions/dump	
     else	
       echo "Please specify full or incremental"
       usage
