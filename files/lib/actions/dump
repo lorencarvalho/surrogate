@@ -37,15 +37,11 @@ runbackup () {
 # monthly 
 if [ `date +%d` == $monthly_backup ]; then 
         runbackup monthly
-fi
- 
-# weekly 
-if [ `date +%a` == $weekly_backup ]; then  
+elif [ `date +%a` == $weekly_backup ]; then  
         runbackup weekly
+else 
+	runbackup daily
 fi
- 
-# daily
-runbackup daily
 
 # fin
 }
