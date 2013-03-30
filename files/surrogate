@@ -86,6 +86,8 @@ do
       source $my_root/lib/actions/full
     elif [[ "$type" == "inc" ]]; then
       source $my_root/lib/actions/inc
+    elif [[ "$type" == "dump" ]]; then
+      source $my_root/lib/actions/dump	
     else	
       echo "Please specify full or incremental"
       usage
