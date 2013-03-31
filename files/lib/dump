@@ -13,7 +13,7 @@ perform_action() {
 	runbackup () {
 		type=$1
 		mkdir -vp $backup_directory/$type/$today_iso_8601
-		dblist=`mysql -u $mysql_user -p${mysql_pass} -S $mysql_socket -se "show databases"  | grep -v ^Database$`
+		dblist=`mysql -u $mysql_user -p${mysql_pass} -S $mysql_socket -se "show databases"  | grep -v ^Database$ | grep -v ^information_schema$`
 		echo "creating full backup using mysqldump"
 		for database in $dblist; do
 	        	mysqldump $dump_opts $database | gzip $gzip_opts > $backup_directory/$type/$today_iso_8601/$database.gz || dump_err=`expr $dump_err + 1`
