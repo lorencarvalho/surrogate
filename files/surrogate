@@ -1,9 +1,29 @@
 #!/bin/bash
 # surrogate
 # loren carvalho, 2012
+count=0
+
+# empty vars on initial call, can reuse init() if needed
+init() {
+	type=""
+	restore=""
+	promote=""
+}
+
+rebuild_configs_for_instance() {
+	instance=$1
+	echo "REBUILDING CONFIGS FOR $instance"
+	mysql_data_path="$original_data_path/$instance"
+	backup_directory="$original_backup_dir/$instance"
+	mysql_collapse_path="$original_collapse_path/$instance"
+	mysql_sanity_path="$original_sanity_path/$instance"
+	inc_backup_path="$backup_directory/$today/inc_$now"
+	last_backup=`tail -n1 $backup_directory/.digest`
+	restore="$backup_directory/.digest"
+}
 
 # explain the usage
-function usage() { 
+usage() { 
 cat <<-EOF
 	usage: $0 options
 
@@ -14,64 +34,46 @@ cat <<-EOF
 
 	-h	Shows this message
 	-b	Backup, either incremental or full, 
-      "surrogate -b full" or "surrogate -b inc"
-	-r 	Restore using default digest location
+      "surrogate -b full", "surrogate -b inc", or "surrogate -b dump" for mysqldump
+	-r 	Restore using default digest location (only for backups made using full or inc.)
 	-c 	Restore, accepts a file containing a list of directories to restore.
 	
 EOF
 exit 1
 }
 
-# if there is no input, barf
-[[ -z "$1" ]] && { usage; }
-
-set -u
-
-which innobackupex &> /dev/null
-
-if [ $? -gt 0 ]; then
-  echo "Can not find innobackupex!"
-  echo "Please install Percona XtraBackup and try again"
-  exit 1
-fi
-
-if [ "$(whoami)" != "root" ]; then
-  if [ -f `which sudo` ]; then
-    sudo $0 "$@"
-    exit $?
+function determine_full_backup_path(){
+  # determine the location of todays backup (for retention)
+  if [[ `date +%d` == "01" ]];
+    then
+        full_backup_path="$backup_directory/monthly/full_$now"
+  elif [[ `date +%u` == "7" ]];
+    then
+        full_backup_path="$backup_directory/weekly/full_$now"
   else
-    usage
+        full_backup_path="$backup_directory/daily/`date +%a`/full_$now"
   fi
-fi
+}
 
-# configs
+# if there is no input, barf
+test $# -ge 1 || usage
+set -u
+# make sure ran as root and check prereqs
+test `whoami` == "root" || { echo "Neet to run as root!"; exit 1; }
+{ which innobackupex && which rsync; } &>/dev/null || { echo "Prereqs not met! Make sure you have rsync and percona-xtrabackup installed."; exit 1; }
+
+# read configs
 source /etc/surrogate/surrogate.conf
 source /etc/surrogate/xtrabackup.conf
-source /usr/local/lib/surrogate/lib/surrogate
+source $my_root/lib/rotate
 
-# empty vars on initial call, can reuse init() if needed
-function init() {
-  type=""
-  restore=""
-  promote=""
-}
+# recursive?
+#source <libdir>/surrogate
 
 init
 
-# quietly run the rotation function
+# rotate if desired
 $auto_rotate && rotate_backups
-
-function rebuild_configs_for_instance(){
-  instance=$1
-  echo "REBUILDING CONFIGS FOR $instance"
-  mysql_data_path="$original_data_path/$instance"
-  backup_directory="$original_backup_dir/$instance"
-  mysql_collapse_path="$original_collapse_path/$instance"
-  mysql_sanity_path="$original_sanity_path/$instance"
-  inc_backup_path="$backup_directory/$today/inc_$now"
-  last_backup=`tail -n1 $backup_directory/.digest`
-  restore="$backup_directory/.digest"
-}
 
 # get input
 while getopts "hb:rc:" option 
@@ -83,27 +85,26 @@ do
   b)
     type=$OPTARG
     if [[ "$type" == "full" ]]; then
-      source $my_root/lib/actions/full
+      source $my_root/lib/full
     elif [[ "$type" == "inc" ]]; then
-      source $my_root/lib/actions/inc
+      source $my_root/lib/inc
     elif [[ "$type" == "dump" ]]; then
-      source $my_root/lib/actions/dump	
-    else	
+      source $my_root/lib/dump	
+    else
       echo "Please specify full or incremental"
       usage
     fi
   ;;
   r)
-    source $my_root/lib/actions/restore
+    source $my_root/lib/restore
   ;;
   c)
     restore=$OPTARG
-    source $my_root/lib/actions/restore
+    source $my_root/lib/restore
   ;;
   esac
 done
 
-count=0
 for instance in $mysql_instances; do
   count=`expr $count + 1` 
 done
