@@ -23,11 +23,11 @@ test `whoami` == "root" || { echo "Neet to run as root!"; exit 1; }
 test -f ~/.my.cnf || { echo "Please create ~/.my.cnf"; exit 3; } 
 
 # guess mysql configs
-mysql_socket=`mysql -e "status" | grep 'UNIX socket:' |awk '{print $3}'`
-mysql_user_system=`stat -c %U $mysql_socket`
 mysql_user_db=`grep user ~/.my.cnf | awk -F "=" '{print $2}' | head -1`
 mysql_pass_db=`grep pass  ~/.my.cnf | awk -F "=" '{print $2}' | head -1`
-datadir=`mysqladmin variables | grep datadir | awk '{print $4}'`
+mysql_socket=`mysql -u $mysql_user_db -p$mysql_pass_db -e "status" | grep 'UNIX socket:' |awk '{print $3}'`
+mysql_user_system=`stat -c %U $mysql_socket`
+datadir=`mysqladmin -u $mysql_user_db -p$mysql_pass_db variables | grep datadir | awk '{print $4}'`
 
 prompt_user mysql_user_db 'MySQL Database User' $mysql_user_db
 prompt_user mysql_pass_db "MySQL Database Password for $mysql_user_db" $mysql_pass_db
