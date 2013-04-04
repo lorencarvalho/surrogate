@@ -1,45 +1,24 @@
 #!/usr/bin/env bash
-# surrogate
-# mysql full backup function
-function perform_action() {
-  instance=$1
+# surrogate innobackupex full backup function
 
-  if [ -z "$socket" ]; then
-    socket_variable=mysql_socket_${instance}
-    socket=${!socket_variable}
-  fi
+perform_action() {
+instance=$1
+if [ -z "$socket" ]; then
+	socket_variable=mysql_socket_${instance}
+	socket=${!socket_variable}
+fi
 
-  determine_full_backup_path
-  if [ ! -d `dirname $full_backup_path` ]; then
-    mkdir -p `dirname $full_backup_path`
-  fi
-
-  echo "creating full backup"
-
-  innobackupex 				\
-  --ibbackup=xtrabackup_55 		\
-  --parallel=8				\
-  --user=$mysql_user 			\
-  --password=$mysql_pass 			\
-  --no-timestamp 				\
-  --compress \
-  --compress-threads=8 \
-  --socket=$socket \
-  --defaults-group="mysqld$instance" \
-  $full_backup_path 2> $logfile_f
-
-  echo "checking if the backup completed sucsessfully"
-  if ! tail $logfile_f -n 1 | grep completed.OK
-  then
-    rm -R $full_backup_path
-    echo "\nERROR: backup failed! (log: "$logfile_f")"
-    echo "status=1" > /tmp/backup-full.status
-    exit 1
-  fi
-
-  echo $full_backup_path > $backup_directory/.digest
-  echo "status=0" > /tmp/backup-full.status
-  echo "Backup Completed OK!"
+# Function defined in main surrogate lib. Updates $full_backup_path var based on day of week / month.
+determine_full_backup_path
+# If $backup_directory/[monthly|weekly|daily] does not exist, create it.
+test -d `dirname $full_backup_path` || mkdir -p `dirname $full_backup_path`
+# Re-read surrogate.conf
+update_vars
+# Explain what is being sent to innobackupex and run it
+echo "$full_backup" 
+eval $full_backup
+# check success and update status file accordingly
+catch $surr_full_status
+# Reset index / digest file with new full backup info
+echo $full_backup_path > $digest
 }
-
-# fin

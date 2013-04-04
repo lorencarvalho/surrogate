@@ -1,12 +1,15 @@
 #!/bin/bash
 # surrogate
 # loren carvalho, 2012
+
+cd
+set -u
 count=0
 
 # empty vars on initial call, can reuse init() if needed
 init() {
 	type=""
-	restore=""
+	digest=""
 	promote=""
 }
 
@@ -19,10 +22,9 @@ rebuild_configs_for_instance() {
 	mysql_sanity_path="$original_sanity_path/$instance"
 	inc_backup_path="$backup_directory/$today/inc_$now"
 	last_backup=`tail -n1 $backup_directory/.digest`
-	restore="$backup_directory/.digest"
+	digest="$backup_directory/.digest"
 }
 
-# explain the usage
 usage() { 
 cat <<-EOF
 	usage: $0 options
@@ -42,72 +44,80 @@ EOF
 exit 1
 }
 
-function determine_full_backup_path(){
-  # determine the location of todays backup (for retention)
-  if [[ `date +%d` == "01" ]];
-    then
-        full_backup_path="$backup_directory/monthly/full_$now"
-  elif [[ `date +%u` == "7" ]];
-    then
-        full_backup_path="$backup_directory/weekly/full_$now"
-  else
-        full_backup_path="$backup_directory/daily/`date +%a`/full_$now"
-  fi
+determine_full_backup_path(){
+if [ `date +%d` == $monthly_backup ]; then
+	full_backup_path="$backup_directory/monthly/${type}_$now"
+elif [ `date +%a` == $weekly_backup ]; then
+	full_backup_path="$backup_directory/weekly/${type}_$now"
+else
+	full_backup_path="$backup_directory/daily/${type}_$now"
+fi
+}
+
+catch() {
+	if [ $? -eq 0 ]; then
+		echo "OK"
+		if [ $# -eq 1 ]; then
+			echo "status=0" > $1
+		fi
+	else
+		echo "Something went wrong, aborting"
+		if [ $# -eq 1 ]; then
+			echo "status=1" > $1
+		fi
+		exit 1
+	fi
+}
+
+update_vars() {
+	# read configs
+	source /etc/surrogate/surrogate.conf
+	source /etc/surrogate/xtrabackup.conf
+	source $my_root/lib/rotate
 }
 
 # if there is no input, barf
 test $# -ge 1 || usage
-set -u
 # make sure ran as root and check prereqs
-test `whoami` == "root" || { echo "Neet to run as root!"; exit 1; }
-{ which innobackupex && which rsync; } &>/dev/null || { echo "Prereqs not met! Make sure you have rsync and percona-xtrabackup installed."; exit 1; }
+test `whoami` == "root" || { echo "Need to run as root!"; exit 1; }
+{ which innobackupex && which rsync; } &>/dev/null || { echo "Make sure you have rsync and percona-xtrabackup installed."; exit 1; }
 
-# read configs
-source /etc/surrogate/surrogate.conf
-source /etc/surrogate/xtrabackup.conf
-source $my_root/lib/rotate
-
-# recursive?
-#source <libdir>/surrogate
-
+update_vars
 init
-
-# rotate if desired
-$auto_rotate && rotate_backups
 
 # get input
 while getopts "hb:rc:" option 
 do
   case $option in
   h)
-    usage
+	usage
   ;;
   b)
-    type=$OPTARG
-    if [[ "$type" == "full" ]]; then
-      source $my_root/lib/full
-    elif [[ "$type" == "inc" ]]; then
-      source $my_root/lib/inc
-    elif [[ "$type" == "dump" ]]; then
-      source $my_root/lib/dump	
-    else
-      echo "Please specify full or incremental"
-      usage
-    fi
+	# Only rotate when backing up.
+	$auto_rotate && rotate_backups
+	type=$OPTARG
+	if [[ "$type" == "full" ]]; then
+		source $my_root/lib/full
+	elif [[ "$type" == "inc" ]]; then
+		source $my_root/lib/inc
+	elif [[ "$type" == "dump" ]]; then
+	      source $my_root/lib/dump	
+	else
+		echo "Please specify full or incremental"
+		usage
+	fi
   ;;
   r)
-    source $my_root/lib/restore
+	source $my_root/lib/restore
   ;;
   c)
-    restore=$OPTARG
-    source $my_root/lib/restore
+	digest=$OPTARG
+	source $my_root/lib/restore
   ;;
   esac
 done
 
-for instance in $mysql_instances; do
-  count=`expr $count + 1` 
-done
+count=`echo $mysql_instances | wc -w`
 
 # Check vars & perform the loaded action
 if [ $count -gt 1 ]; then

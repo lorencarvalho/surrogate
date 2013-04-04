@@ -1,35 +1,23 @@
 #!/usr/bin/env bash
-# surrogate
-# mysql full backup function
+# surrogate full backup function using mysqldump
 dump_err=0
 
 perform_action() {
-	instance=$1
-	if [ -z "$socket" ]; then
-		socket_variable=mysql_socket_${instance}
-		socket=${!socket_variable}
-	  fi
+instance=$1
+if [ -z "$socket" ]; then
+	socket_variable=mysql_socket_${instance}
+	socket=${!socket_variable}
+fi
 
-	runbackup () {
-		type=$1
-		mkdir -vp $backup_directory/$type/$today_iso_8601
-		dblist=`mysql -u $mysql_user -p${mysql_pass} -S $mysql_socket -se "show databases"  | grep -v ^Database$ | grep -v ^information_schema$`
-		echo "creating full backup using mysqldump"
-		for database in $dblist; do
-	        	mysqldump $dump_opts $database | gzip $gzip_opts > $backup_directory/$type/$today_iso_8601/$database.gz || dump_err=`expr $dump_err + 1`
-		done
-		test $dump_err -eq 0 && echo "status=0" > /tmp/backup-full.status || echo "status=1" > /tmp/backup-full.status
-# logfile_f
-	}
- 
-# monthly 
-	if [ `date +%d` == $monthly_backup ]; then 
-	        runbackup monthly
-	elif [ `date +%a` == $weekly_backup ]; then  
-	        runbackup weekly
-	else 
-		runbackup daily
-	fi
-
-# fin
+# Determine full_backup_path based on day of week and day of month
+determine_full_backup_path
+mkdir -p $full_backup_path
+dblist=`mysql -u $mysql_user -p${mysql_pass} -S $mysql_socket -se "show databases"  | grep -v ^Database$ | grep -v ^information_schema$`
+for database in $dblist; do
+	update_vars
+	echo $dump_backup
+       	eval $dump_backup
+	# check $? and update status file accordingly
+	catch $surr_full_status
+done
 }
