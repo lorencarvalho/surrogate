@@ -2,6 +2,9 @@
 
 # Default var values
 confdir="/etc/surrogate"
+libdir=/usr/local/lib/surrogate
+logdir=/var/log/surrogate
+
 
 prompt_user() {
   variable=$1
@@ -16,12 +19,19 @@ prompt_user() {
 test `whoami` == "root" || { echo "Neet to run as root!"; exit 1; }
 { which innobackupex && which rsync; } &>/dev/null || { echo "Prereqs not met! Make sure you have rsync and percona-xtrabackup installed."; exit 1; }
 
-prompt_user mysql_user_system 'MySQL System User' 'mysql'
-prompt_user mysql_user_db 'MySQL Database User' 'root'
-prompt_user datadir 'Directory to store data' '/data'
-prompt_user backup_directory 'Directory to store backups' '/data/backups'
-prompt_user libdir 'Directory to store libs' '/usr/local/lib/surrogate'
-prompt_user logdir 'Directory to store surrogate logs' '/var/log/surrogate' 
+# guess mysql configs
+mysql_socket=`mysql -e "status" | grep 'UNIX socket:' |awk '{print $3}'`
+mysql_user_system=`stat -c %U $mysql_socket`
+mysql_user_db=`grep user ~/.my.cnf | awk '{print $3}'`
+mysql_pass_db=`grep pass  ~/.my.cnf | awk '{print $3}'`
+datadir=`mysqladmin variables | grep datadir | awk '{print $4}'`
+
+prompt_user mysql_user_db 'MySQL Database User' $mysql_user_db
+prompt_user mysql_pass_db "MySQL Database Password for $mysql_user_db" $mysql_pass_db
+prompt_user mysql_socket 'MySQL Socket' $mysql_socket
+prompt_user datadir 'MySQL datadir' $datadir
+prompt_user mysql_user_system "MySQL System User (owner of $datadir)" $mysql_user_system
+prompt_user backup_directory 'Directory to store backups' '/backup/mysql'
 prompt_user cron_h 'Hour to run full backups at' '8'
 prompt_user cron_m 'Minute to run full backups at' '0'
 prompt_user install_qpress 'Should qpress be installed? [Y/N]' 'N'
@@ -40,6 +50,10 @@ rsync -ab --suffix=.bak  ./files/conf/ $confdir/
 
 # not sure if needed.
 chmod 600 $confdir/surrogate.conf
+
+sed -i "s|<mysql_socket>|$mysql_socket|" $confdir/surrogate.conf
+sed -i "s|<mysql_user_db>|$mysql_user_db|" $confdir/surrogate.conf
+sed -i "s|<mysql_pass_db>|$mysql_pass_db|" $confdir/surrogate.conf
 
 sed -i "s|<datadir>|$datadir|" $confdir/surrogate.conf
 sed -i "s|<mysql_user_db>|$mysql_user_db|" $confdir/surrogate.conf
