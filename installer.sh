@@ -22,8 +22,8 @@ test `whoami` == "root" || { echo "Neet to run as root!"; exit 1; }
 # guess mysql configs
 mysql_socket=`mysql -e "status" | grep 'UNIX socket:' |awk '{print $3}'`
 mysql_user_system=`stat -c %U $mysql_socket`
-mysql_user_db=`grep user ~/.my.cnf | awk '{print $3}'`
-mysql_pass_db=`grep pass  ~/.my.cnf | awk '{print $3}'`
+mysql_user_db=`grep user ~/.my.cnf | awk -F "=" '{print $2}'`
+mysql_pass_db=`grep pass  ~/.my.cnf | awk -F "=" '{print $2}'`
 datadir=`mysqladmin variables | grep datadir | awk '{print $4}'`
 
 prompt_user mysql_user_db 'MySQL Database User' $mysql_user_db
