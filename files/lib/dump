@@ -13,6 +13,7 @@ fi
 determine_full_backup_path
 mkdir -p $full_backup_path
 dblist=`mysql -u $mysql_user -p${mysql_pass} -S $mysql_socket -se "show databases"  | grep -v ^Database$ | grep -v ^information_schema$`
+catch $surr_full_status
 for database in $dblist; do
 	update_vars
 	echo $dump_backup

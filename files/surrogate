@@ -58,12 +58,12 @@ catch() {
 	if [ $? -eq 0 ]; then
 		echo "OK"
 		if [ $# -eq 1 ]; then
-			echo "status=0" > $1
+			echo $surr_success_msg > $1
 		fi
 	else
 		echo "Something went wrong, aborting"
 		if [ $# -eq 1 ]; then
-			echo "status=1" > $1
+			echo $surr_fail_msg > $1
 		fi
 		exit 1
 	fi
