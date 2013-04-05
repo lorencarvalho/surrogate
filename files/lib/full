@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# surrogate innobackupex full backup function
+
+perform_action() {
+instance=$1
+if [ -z "$socket" ]; then
+	socket_variable=mysql_socket_${instance}
+	socket=${!socket_variable}
+fi
+
+# Function defined in main surrogate lib. Updates $full_backup_path var based on day of week / month.
+determine_full_backup_path
+# If $backup_directory/[monthly|weekly|daily] does not exist, create it.
+test -d `dirname $full_backup_path` || mkdir -p `dirname $full_backup_path`
+# Re-read surrogate.conf
+update_vars
+# Explain what is being sent to innobackupex and run it
+echo "$full_backup" 
+eval $full_backup
+# check success and update status file accordingly
+catch $surr_full_status
+# Reset index / digest file with new full backup info
+echo $full_backup_path > $digest
+}

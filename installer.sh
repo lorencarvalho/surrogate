@@ -1,92 +1,69 @@
 #/usr/bin/env bash
 
-if [ "$(whoami)" != "root" ]; then
-  if [ -f `which sudo` ]; then
-    sudo $0 "$@"
-    exit $?
-  else
-    usage
-    exit 1
-  fi
-fi
+# Default var values
+confdir="/etc/surrogate"
+libdir=/usr/local/lib/surrogate
+logdir=/var/log/surrogate
 
-function prompt_user(){
+
+prompt_user() {
   variable=$1
   prompt=$2
   default_value=$3
-
-  if [ -z "$variable" ]; then
-    echo "Variable name was not given!" && exit 1
-  fi
-
+  test $# -eq 3 || exit 
   read -p "$prompt [$default_value]: " $variable
-
-  if [ -z "${!variable}" ]; then
-    eval "$variable=$default_value"
-  fi
-
+  test -z "${!variable}" && eval "$variable=$default_value" 
 }
 
-prompt_user mysql_user_system 'MySQL System User' 'mysql'
-prompt_user mysql_user_db 'MySQL Database User' 'root'
-prompt_user datadir 'Directory to store data' '/data'
-prompt_user backup_directory 'Directory to store backups' '/data/backups'
-prompt_user confdir 'Directory to store configs' '/etc/surrogate'
-prompt_user libdir 'Directory to store libs' '/usr/local/lib/surrogate'
-prompt_user logdir 'Directory to store surrogate logs' '/var/log/surrogate' 
+# make sure ran as root and check prereqa
+test `whoami` == "root" || { echo "Neet to run as root!"; exit 1; }
+{ which innobackupex && which rsync; } &>/dev/null || { echo "Prereqs not met! Make sure you have rsync and percona-xtrabackup installed."; exit 1; }
+
+# get .my.cnf at all cost!
+test -f ~/.my.cnf || { echo "Please create ~/.my.cnf"; exit 3; } 
+
+# guess mysql configs
+mysql_user_db=`grep user ~/.my.cnf | awk -F "=" '{print $2}' | head -1 | tr -d " "`
+mysql_pass_db=`grep pass  ~/.my.cnf | awk -F "=" '{print $2}' | head -1 | tr -d " "`
+mysql_socket=`mysql -u $mysql_user_db -p$mysql_pass_db -e "status" | grep 'UNIX socket:' |awk '{print $3}'`
+mysql_user_system=`stat -c %U $mysql_socket`
+datadir=`mysqladmin -u $mysql_user_db -p$mysql_pass_db variables | grep datadir | awk '{print $4}'`
+
+prompt_user mysql_user_db 'MySQL Database User' $mysql_user_db
+prompt_user mysql_pass_db "MySQL Database Password for $mysql_user_db" $mysql_pass_db
+prompt_user mysql_socket 'MySQL Socket' $mysql_socket
+prompt_user datadir 'MySQL datadir' $datadir
+prompt_user mysql_user_system "MySQL System User (owner of $datadir)" $mysql_user_system
+prompt_user backup_directory 'Directory to store backups' '/backup/mysql'
 prompt_user cron_h 'Hour to run full backups at' '8'
 prompt_user cron_m 'Minute to run full backups at' '0'
 prompt_user install_qpress 'Should qpress be installed? [Y/N]' 'N'
 
-# describe use
-function usage() { 
-  cat <<-EOF
-
-    Need to run as root please! 
-
-EOF
-exit 1
-}
-
-/bin/echo -ne "Installing Surrogate\t\t[          ] 00%\r" 
+echo "Installing Surrogate..."
 
 # Create required directories, if needed
-for dir in "$confdir $libdir"; do
-  if ! [ -d "$dir" ]; then
-    mkdir -p $dir
-  fi
-
-done
-
-/bin/echo -ne "Installing Surrogate\t\t[##        ] 25%\r" 
+mkdir -vp $confdir $libdir
 
 # install the software
-rsync -a ./files/ $libdir/
+rsync -a ./files/lib $libdir/
+rsync -a ./files/surrogate /usr/local/bin
 
-/bin/echo -ne "Installing Surrogate\t\t[####      ] 50%\r"
+# configure and preserve existing config files in confdir
+rsync -ab --suffix=.bak  ./files/conf/ $confdir/
 
-# configure it
-cp -R $libdir/conf/* $confdir/
+# not sure if needed.
 chmod 600 $confdir/surrogate.conf
 
-sed -i "s|/data|$datadir|" $confdir/surrogate.conf
-sed -i "s|=root|=$mysql_user_db|" $confdir/surrogate.conf
-sed -i "s|/data/backups|$backup_directory|" $confdir/surrogate.conf
-sed -i "s|/data|$datadir|" $libdir/lib/surrogate
-sed -i "s|/var/log/surrogate|$logdir|" $confdir/surrogate.conf
-sed -i "s|/var/log/surrogate|$logdir|" $libdir/surrogate 
-sed -i "s|/usr/local/lib/surrogate|$libdir|" $confdir/surrogate.conf
-sed -i "s|/usr/local/lib/surrogate|$libdir|" $libdir/surrogate
+sed -i "s|<mysql_socket>|$mysql_socket|" $confdir/surrogate.conf
+sed -i "s|<mysql_user_db>|$mysql_user_db|" $confdir/surrogate.conf
+sed -i "s|<mysql_pass_db>|$mysql_pass_db|" $confdir/surrogate.conf
 
-/bin/echo -ne "Installing Surrogate\t\t[######    ] 75%\r"
-
-# symlink to include in path
-if [[ -h /usr/local/bin/surrogate ]];
-  then
-    rm /usr/local/bin/surrogate
-fi
-
-ln -s /usr/local/lib/surrogate/surrogate /usr/local/bin/surrogate
+sed -i "s|<datadir>|$datadir|" $confdir/surrogate.conf
+sed -i "s|<mysql_user_db>|$mysql_user_db|" $confdir/surrogate.conf
+sed -i "s|<backup_directory>|$backup_directory|" $confdir/surrogate.conf
+sed -i "s|<logdir>|$logdir|" $confdir/surrogate.conf
+sed -i "s|<libdir>|$libdir|" $confdir/surrogate.conf
+sed -i "s|<libdir>|$libdir|" /usr/local/bin/surrogate
 
 # these should be created during backup runs
 #mkdir -p $datadir/backups/monthly
@@ -103,7 +80,8 @@ ln -s /usr/local/lib/surrogate/surrogate /usr/local/bin/surrogate
 #mkdir -p $logdir 
 #can break mysql during installation
 #chown -R $mysql_user_system:$mysql_user_system $datadir
-touch $datadir/backups/.digest
+mkdir -p $backup_directory
+touch $backup_directory/.digest
 
 if [ "$install_qpress" == "Y" ]; then
   echo installing qpress
@@ -112,11 +90,8 @@ if [ "$install_qpress" == "Y" ]; then
   mv qpress /usr/local/bin/
 fi
 
-echo adding cron entry
 echo >> /var/spool/cron/root
 echo "$cron_m $cron_h * * * /usr/local/bin/surrogate -b full" >> /var/spool/cron/root
-
-/bin/echo -ne "Installing Surrogate\t\t[##########] 100%\r"
 
 cat <<-EOF
 

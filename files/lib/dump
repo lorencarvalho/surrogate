@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# surrogate full backup function using mysqldump
+dump_err=0
+
+perform_action() {
+instance=$1
+if [ -z "$socket" ]; then
+	socket_variable=mysql_socket_${instance}
+	socket=${!socket_variable}
+fi
+
+# Determine full_backup_path based on day of week and day of month
+determine_full_backup_path
+mkdir -p $full_backup_path
+dblist=`mysql -u $mysql_user -p${mysql_pass} -S $mysql_socket -se "show databases"  | grep -v ^Database$ | grep -v ^information_schema$`
+for database in $dblist; do
+	update_vars
+	echo $dump_backup
+       	eval $dump_backup
+	# check $? and update status file accordingly
+	catch $surr_full_status
+done
+}

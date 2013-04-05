@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+# surrogate
+# restoration function
+
+locate_mysql_commands(){
+# System V
+if [ -f "/etc/init.d/mysql" ]; then
+	startup_command="/etc/init.d/mysql start"
+	shutdown_command="/etc/init.d/mysql stop"
+# System D
+elif [ -f "/usr/bin/systemctl" ]; then
+	startup_command="/usr/bin/systemctl start mysqld"
+	shutdown_command="/usr/bin/systemctl stop mysqld"
+else
+	sur_out
+	echo "Can't determine the mysql startup/shutdown commands!"
+	clear_out
+	exit 1
+fi
+}
+
+perform_action() {
+instance=$1
+if [ -z "$socket" ]; then
+	socket_variable=mysql_socket_${instance}
+	socket=${!socket_variable}
+fi
+locate_mysql_commands
+update_vars
+
+# Make sure user wants to restore right now
+read -p "Restore using $digest? [Y/N] " restore_verify
+test $restore_verify == "Y" || exit 3
+
+# Clear out if any leftover active backup dirs from previous runs
+test -d $active_backup && rm -R $active_backup
+full_backup=`head $digest -n 1`
+echo "Copying full backup files: " $full_backup
+mkdir -vp $active_backup
+cp -vr $full_backup/* $active_backup
+
+# Extract qpress archives
+for bf in `find $active_backup -iname "*\.qp"`; do 
+	qpress -d $bf $(dirname $bf) && rm -f $bf; 
+done
+
+# explain what is being sent to innobackupex
+echo "Preparing full backup..."
+echo $full_prep
+eval $full_prep
+catch
+# find the incrementals and loop restore them
+grep inc_ $digest | while read incremental_backup ; do
+	update_vars
+	test -d $active_incremental && rm -vR $active_incremental
+	echo "copying incremental backup: " $incremental_backup
+	mkdir -vp $active_incremental
+	cp -vr $incremental_backup/* $active_incremental
+	for bf in `find $active_incremental -iname "*\.qp"`;  do 
+		qpress -d $bf $(dirname $bf) && rm -f $bf; 
+	done
+	find $incremental_backup -name .delta -empty -maxdepth 2 -exec rm -v {} \;
+	# Explain what is being sent to innobackupex
+	echo $inc_restore
+	eval $inc_restore
+	catch 
+	# clear out temp directory before proceeding to the next incremental
+	rm -vR $active_incremental
+done
+# run inno log apply
+echo "Applying logs"
+echo $log_apply
+eval $log_apply 
+catch
+eval $shutdown_command
+echo "Moving mysql data files..."
+rm -rf $mysql_sanity_path
+mv -fv $mysql_data_path $mysql_sanity_path
+mkdir -vp $mysql_data_path
+
+# file restore 
+echo $file_restore
+eval $file_restore
+catch
+echo "Starting cleanup tasks"
+rm -Rv $mysql_log_path/*
+mkdir -pv $mysql_log_path/bin
+chmod 700 -R $mysql_data_path/ && chown mysql:mysql -R $mysql_data_path/
+chmod 700 -R $mysql_log_path/ && chown mysql:mysql -R $mysql_log_path/
+rm -vR $active_backup/*
+rmdir -v $active_backup
+eval $startup_command
+echo "Restore Completed OK!"
+}

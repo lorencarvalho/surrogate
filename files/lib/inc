@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Surrogate incremental backup function
+
+perform_action() {
+instance=$1
+if [ -z "$socket" ]; then
+	socket_variable=mysql_socket_${instance}
+	socket=${!socket_variable}
+fi
+
+# Re-read surrogate.conf
+update_vars
+# Explain what is being sent to innobackupex.
+echo $inc_backup
+# Perform incremental backup from where the last backup stopped.
+eval $inc_backup 
+catch $surr_inc_status
+# Update index / digest file with new inc backup
+echo $inc_backup_path >> $digest
+}

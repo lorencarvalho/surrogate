@@ -2,8 +2,30 @@
 # surrogate
 # loren carvalho, 2012
 
-# explain the usage
-function usage() { 
+cd
+set -u
+count=0
+
+# empty vars on initial call, can reuse init() if needed
+init() {
+	type=""
+	digest=""
+	promote=""
+}
+
+rebuild_configs_for_instance() {
+	instance=$1
+	echo "REBUILDING CONFIGS FOR $instance"
+	mysql_data_path="$original_data_path/$instance"
+	backup_directory="$original_backup_dir/$instance"
+	mysql_collapse_path="$original_collapse_path/$instance"
+	mysql_sanity_path="$original_sanity_path/$instance"
+	inc_backup_path="$backup_directory/$today/inc_$now"
+	last_backup=`tail -n1 $backup_directory/.digest`
+	digest="$backup_directory/.digest"
+}
+
+usage() { 
 cat <<-EOF
 	usage: $0 options
 
@@ -14,99 +36,88 @@ cat <<-EOF
 
 	-h	Shows this message
 	-b	Backup, either incremental or full, 
-      "surrogate -b full" or "surrogate -b inc"
-	-r 	Restore using default digest location
+      "surrogate -b full", "surrogate -b inc", or "surrogate -b dump" for mysqldump
+	-r 	Restore using default digest location (only for backups made using full or inc.)
 	-c 	Restore, accepts a file containing a list of directories to restore.
 	
 EOF
 exit 1
 }
 
+determine_full_backup_path(){
+if [ `date +%d` == $monthly_backup ]; then
+	full_backup_path="$backup_directory/monthly/${type}_$now"
+elif [ `date +%a` == $weekly_backup ]; then
+	full_backup_path="$backup_directory/weekly/${type}_$now"
+else
+	full_backup_path="$backup_directory/daily/${type}_$now"
+fi
+}
+
+catch() {
+	if [ $? -eq 0 ]; then
+		echo "OK"
+		if [ $# -eq 1 ]; then
+			echo "status=0" > $1
+		fi
+	else
+		echo "Something went wrong, aborting"
+		if [ $# -eq 1 ]; then
+			echo "status=1" > $1
+		fi
+		exit 1
+	fi
+}
+
+update_vars() {
+	# read configs
+	source /etc/surrogate/surrogate.conf
+	source /etc/surrogate/xtrabackup.conf
+	source $my_root/lib/rotate
+}
+
 # if there is no input, barf
-[[ -z "$1" ]] && { usage; }
+test $# -ge 1 || usage
+# make sure ran as root and check prereqs
+test `whoami` == "root" || { echo "Need to run as root!"; exit 1; }
+{ which innobackupex && which rsync; } &>/dev/null || { echo "Make sure you have rsync and percona-xtrabackup installed."; exit 1; }
 
-set -u
-
-which innobackupex &> /dev/null
-
-if [ $? -gt 0 ]; then
-  echo "Can not find innobackupex!"
-  echo "Please install Percona XtraBackup and try again"
-  exit 1
-fi
-
-if [ "$(whoami)" != "root" ]; then
-  if [ -f `which sudo` ]; then
-    sudo $0 "$@"
-    exit $?
-  else
-    usage
-  fi
-fi
-
-# configs
-source /etc/surrogate/surrogate.conf
-source /etc/surrogate/xtrabackup.conf
-source /usr/local/lib/surrogate/lib/surrogate
-
-# empty vars on initial call, can reuse init() if needed
-function init() {
-  type=""
-  restore=""
-  promote=""
-}
-
+update_vars
 init
-
-# quietly run the rotation function
-$auto_rotate && rotate_backups
-
-function rebuild_configs_for_instance(){
-  instance=$1
-  echo "REBUILDING CONFIGS FOR $instance"
-  mysql_data_path="$original_data_path/$instance"
-  backup_directory="$original_backup_dir/$instance"
-  mysql_collapse_path="$original_collapse_path/$instance"
-  mysql_sanity_path="$original_sanity_path/$instance"
-  inc_backup_path="$backup_directory/$today/inc_$now"
-  last_backup=`tail -n1 $backup_directory/.digest`
-  restore="$backup_directory/.digest"
-}
 
 # get input
 while getopts "hb:rc:" option 
 do
   case $option in
   h)
-    usage
+	usage
   ;;
   b)
-    type=$OPTARG
-    if [[ "$type" == "full" ]]; then
-      source $my_root/lib/actions/full
-    elif [[ "$type" == "inc" ]]; then
-      source $my_root/lib/actions/inc
-    elif [[ "$type" == "dump" ]]; then
-      source $my_root/lib/actions/dump	
-    else	
-      echo "Please specify full or incremental"
-      usage
-    fi
+	# Only rotate when backing up.
+	$auto_rotate && rotate_backups
+	type=$OPTARG
+	if [[ "$type" == "full" ]]; then
+		source $my_root/lib/full
+	elif [[ "$type" == "inc" ]]; then
+		source $my_root/lib/inc
+	elif [[ "$type" == "dump" ]]; then
+	      source $my_root/lib/dump	
+	else
+		echo "Please specify full or incremental"
+		usage
+	fi
   ;;
   r)
-    source $my_root/lib/actions/restore
+	source $my_root/lib/restore
   ;;
   c)
-    restore=$OPTARG
-    source $my_root/lib/actions/restore
+	digest=$OPTARG
+	source $my_root/lib/restore
   ;;
   esac
 done
 
-count=0
-for instance in $mysql_instances; do
-  count=`expr $count + 1` 
-done
+count=`echo $mysql_instances | wc -w`
 
 # Check vars & perform the loaded action
 if [ $count -gt 1 ]; then
