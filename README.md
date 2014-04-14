@@ -9,7 +9,6 @@ _Bring back life form. Priority One. All other priorities rescinded._
 ### Prerequisites
 
 - Qpress [Download, extract & mv to /usr/bin](http://www.quicklz.com/qpress-11-linux-x64.tar)
-
 - Percona 5.5
  - Functionality for older version of MySQL is on the TODO list
 - Percona Xtrabackup 2.0.1 or later
@@ -34,35 +33,11 @@ Main configuration file
 Xtrabackup tuning configuration (TODO)
 - /etc/surrogate/xtrabackup.conf
 
-#### Retention directory tree 
-
-    /data
-    |-- backups
-    |   |-- daily
-    |   |   |-- Fri
-    |   |   |-- Mon
-    |   |   |-- Sat
-    |   |   |-- Sun
-    |   |   |-- Thu
-    |   |   |-- Tue
-    |   |   `-- Wed
-    |   |-- monthly
-    |   `-- weekly
-    |-- log
-    |   `-- bin
-    |-- mysql
-    |-- tmp
-
-#### Default rotation policy (configurable in surrogate.conf)
-
-- 7 days
-- 4 weeks
-- 6 months
-
 #### Authors
 
 - Loren Carvalho
 - Jesse R. Adams
+- Sebastian Ostrowski
 
 #### License
 GPLv3
