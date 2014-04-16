@@ -35,8 +35,6 @@ prompt_user mysql_socket 'MySQL Socket' $mysql_socket
 prompt_user datadir 'MySQL datadir' $datadir
 prompt_user mysql_user_system "MySQL System User (owner of $datadir)" $mysql_user_system
 prompt_user backup_directory 'Directory to store backups' '/backup/mysql'
-prompt_user cron_h 'Hour to run full backups at' '8'
-prompt_user cron_m 'Minute to run full backups at' '0'
 prompt_user install_qpress 'Should qpress be installed? [Y/N]' 'N'
 
 echo "Installing Surrogate..."
@@ -89,9 +87,6 @@ if [ "$install_qpress" == "Y" ]; then
   tar xf qpress-11-linux-x64.tar
   mv qpress /usr/local/bin/
 fi
-
-echo >> /var/spool/cron/root
-echo "$cron_m $cron_h * * * /usr/local/bin/surrogate -b full" >> /var/spool/cron/root
 
 cat <<-EOF
 
