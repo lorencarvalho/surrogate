@@ -17,7 +17,6 @@ function perform_action() {
   echo "creating full backup"
 
   innobackupex 				\
-  --ibbackup=xtrabackup_55 		\
   --parallel=8				\
   --user=$mysql_user 			\
   --password=$mysql_pass 			\

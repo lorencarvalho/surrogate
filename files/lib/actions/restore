@@ -56,7 +56,6 @@ function perform_action() {
 
   echo "preparing full backup..."
   innobackupex 			\
-  --ibbackup=xtrabackup_55 	\
   --parallel=4 			\
   --user=$mysql_user 		\
   --password=$mysql_pass 		\
@@ -94,7 +93,6 @@ function perform_action() {
 
   echo "preparing incremental backup..."
   innobackupex 			\
-  --ibbackup=xtrabackup_55 	\
   --parallel=4 			\
   --user=$mysql_user 		\
   --password=$mysql_pass 		\
@@ -117,7 +115,6 @@ function perform_action() {
 
   echo "applying Logs"
   innobackupex 			\
-  --ibbackup=xtrabackup_55 	\
   --parallel=4 			\
   --user=$mysql_user 		\
   --password=$mysql_pass 		\
@@ -143,7 +140,6 @@ function perform_action() {
   echo "restoring data files..."
   echo "calling innobackupex..."
   innobackupex 			\
-  --ibbackup=xtrabackup_55 	\
   --user=$mysql_user 		\
   --password=$mysql_pass 		\
   --socket=$socket \

@@ -14,7 +14,6 @@ function perform_action() {
 
   #perform incremental backup from where the last backup stoped
   innobackupex 				\
-  --ibbackup=xtrabackup_55 		\
   --parallel=8 				\
   --user=$mysql_user 			\
   --password=$mysql_pass 			\
