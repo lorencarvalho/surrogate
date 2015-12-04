@@ -1,7 +1,3 @@
-### Warning
-
-This project is no longer maintained actively. Use at your own risk. 
-
 ### Surrogate
 
 A simple bash wrapper for Percona's Xtrabackup utility.
