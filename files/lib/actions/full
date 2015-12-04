@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# surrogate
-# mysql full backup function
+
 function perform_action() {
   instance=$1
 
@@ -16,11 +15,11 @@ function perform_action() {
 
   echo "creating full backup"
 
-  innobackupex 				\
-  --parallel=8				\
-  --user=$mysql_user 			\
-  --password=$mysql_pass 			\
-  --no-timestamp 				\
+  innobackupex \
+  --parallel=8 \
+  --user=$mysql_user \
+  --password=$mysql_pass \
+  --no-timestamp \
   --compress \
   --compress-threads=8 \
   --socket=$socket \
@@ -40,5 +39,3 @@ function perform_action() {
   echo "status=0" > $backup_directory/backup.status
   echo "Backup Completed OK!"
 }
-
-# fin
