@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# surrogate
-# restoration function
+
+set -u
 
 function locate_mysql_commands(){
   # System V
@@ -23,7 +23,7 @@ function locate_mysql_commands(){
 
 function perform_action() {
   instance=$1
-  
+
   if [ -z "$socket" ]; then
     socket_variable=mysql_socket_${instance}
     socket=${!socket_variable}
@@ -50,7 +50,7 @@ function perform_action() {
   cp -r $full_backup/* $active_backup
 
   for bf in `find $active_backup -iname "*\.qp"`; 
-  do 
+  do
     qpress -d $bf $(dirname $bf) && rm -f $bf; 
   done
 
@@ -61,7 +61,7 @@ function perform_action() {
   --password=$mysql_pass 		\
   --apply-log 			\
   --socket=$socket \
-  --defaults-group="mysqld$port" \
+  --defaults-group="mysqld$instance" \
   --redo-only $active_backup 2> $logfile_r
 
   # see if the apply-log completed successfully
@@ -99,7 +99,7 @@ function perform_action() {
   --apply-log 			\
   --redo-only $active_backup 	\
   --socket=$socket \
-  --defaults-group="mysqld$port" \
+  --defaults-group="mysqld$instance" \
   --incremental-dir=$active_incremental 2>> $logfile_r
 
   rm -R $active_incremental
@@ -119,7 +119,7 @@ function perform_action() {
   --user=$mysql_user 		\
   --password=$mysql_pass 		\
   --socket=$socket \
-  --defaults-group="mysqld$port" \
+  --defaults-group="mysqld$instance" \
   --apply-log $active_backup 2>> $logfile_r
 
   echo "check if the apply log completed successfully"
@@ -143,7 +143,7 @@ function perform_action() {
   --user=$mysql_user 		\
   --password=$mysql_pass 		\
   --socket=$socket \
-  --defaults-group="mysqld$port" \
+  --defaults-group="mysqld$instance" \
   --copy-back $active_backup 2>> $logfile_r
 
   echo "delete all log files to start fresh after restore"

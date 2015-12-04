@@ -74,7 +74,7 @@ function rebuild_configs_for_instance(){
 }
 
 # get input
-while getopts "hb:rc:" option 
+while getopts "hb:rc:" option
 do
   case $option in
   h)
@@ -86,9 +86,6 @@ do
       source $my_root/lib/actions/full
     elif [[ "$type" == "inc" ]]; then
       source $my_root/lib/actions/inc
-    else	
-      echo "Please specify full or incremental"
-      usage
     fi
   ;;
   r)
@@ -107,12 +104,12 @@ for instance in $mysql_instances; do
 done
 
 # Check vars & perform the loaded action
-if [ $count -gt 1 ]; then
-  original_data_path=$mysql_data_path
-  original_backup_dir=$backup_directory
-  original_collapse_path=$mysql_collapse_path
-  original_sanity_path=$mysql_sanity_path
+original_data_path=$mysql_data_path
+original_backup_dir=$backup_directory
+original_collapse_path=$mysql_collapse_path
+original_sanity_path=$mysql_sanity_path
 
+if [ $count -gt 1 ]; then
   for instance in $mysql_instances; do
     echo "Processing instance: $instance"
     rebuild_configs_for_instance $instance
@@ -120,7 +117,9 @@ if [ $count -gt 1 ]; then
   done
 else
   socket=$mysql_socket
-  perform_action $mysql_instances
+  if type perform_action 2>&1 > /dev/null; then
+    perform_action $mysql_instances
+  fi
 fi
 
 # fin

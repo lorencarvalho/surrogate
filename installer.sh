@@ -70,15 +70,21 @@ rsync -a ./files/ $libdir/
 /bin/echo -ne "Installing Surrogate\t\t[####      ] 50%\r"
 
 # configure it
-cp -R $libdir/conf/* $confdir/
-chmod 600 $confdir/surrogate.conf
-sed -i "s|/data|$datadir|" $confdir/surrogate.conf
-sed -i "s|=root|=$mysql_user_db|" $confdir/surrogate.conf
-sed -i "s|/data|$datadir|" $libdir/lib/surrogate
-sed -i "s|/var/log/surrogate|$logdir|" $confdir/surrogate.conf
-sed -i "s|/var/log/surrogate|$logdir|" $libdir/surrogate 
-sed -i "s|/usr/local/lib/surrogate|$libdir|" $confdir/surrogate.conf
-sed -i "s|/usr/local/lib/surrogate|$libdir|" $libdir/surrogate
+configure () {
+    cp -R $libdir/conf/* $confdir/
+    chmod 600 $confdir/surrogate.conf
+    sed -i "s|/data|$datadir|" $confdir/surrogate.conf
+    sed -i "s|=root|=$mysql_user_db|" $confdir/surrogate.conf
+    sed -i "s|/data|$datadir|" $libdir/lib/surrogate
+    sed -i "s|/var/log/surrogate|$logdir|" $confdir/surrogate.conf
+    sed -i "s|/var/log/surrogate|$logdir|" $libdir/surrogate 
+    sed -i "s|/usr/local/lib/surrogate|$libdir|" $confdir/surrogate.conf
+    sed -i "s|/usr/local/lib/surrogate|$libdir|" $libdir/surrogate
+}
+
+if ! [ -f $confdir/surrogate.conf ];then
+    configure
+fi
 
 /bin/echo -ne "Installing Surrogate\t\t[######    ] 75%\r"
 
@@ -100,12 +106,17 @@ mkdir -p $logdir
 chown -R $mysql_user_system:$mysql_user_system $datadir
 touch $datadir/backups/.digest
 
-if [ "$install_qpress" == "Y" ]; then
-  echo installing qpress
-  wget http://www.quicklz.com/qpress-11-linux-x64.tar
-  tar xf qpress-11-linux-x64.tar
-  mv qpress /usr/local/bin/
-fi
+case "$install_qpress" in
+  [yY])
+    echo installing qpress
+    wget http://www.quicklz.com/qpress-11-linux-x64.tar
+    tar xf qpress-11-linux-x64.tar
+    mv qpress /usr/local/bin/
+    ;;
+  *)
+    :
+    ;;
+esac
 
 echo adding cron entry
 (crontab -l ; echo "$cron_m $cron_h * * * /usr/local/bin/surrogate -b full") | sort - | uniq - | crontab -
