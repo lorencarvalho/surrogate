@@ -108,7 +108,7 @@ if [ "$install_qpress" == "Y" ]; then
 fi
 
 echo adding cron entry
-(crontab -l ; echo $cron_m $cron_h * * * /usr/local/bin/surrogate -b full) | sort - | uniq - | crontab -
+(crontab -l ; echo "$cron_m $cron_h * * * /usr/local/bin/surrogate -b full") | sort - | uniq - | crontab -
 
 /bin/echo -ne "Installing Surrogate\t\t[##########] 100%\r"
 
