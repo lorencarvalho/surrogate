@@ -29,7 +29,9 @@ function perform_action() {
   echo "checking if the backup completed sucsessfully"
   if ! tail $logfile_f -n 1 | grep completed.OK
   then
-    rm -R $full_backup_path
+    if [ -z $full_backup_path ]; then
+        rm -rf $full_backup_path
+    fi
     echo "\nERROR: backup failed! (log: "$logfile_f")"
     echo "status=1" > $backup_directory/backup.status
     exit 1
