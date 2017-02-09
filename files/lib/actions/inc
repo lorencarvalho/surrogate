@@ -39,7 +39,7 @@ function perform_action() {
   echo "status=0" > $backup_directory/backup.status
   echo "Backup Completed OK!"
   
-  if tail $logfile_f -n 1 | grep completed.OK
+  if tail $logfile_i -n 1 | grep completed.OK
   then
     echo "Creating archive for S3.."
     tar -czf /tmp/$(basename ${inc_backup_path}).tar.gz ${inc_backup_path}
