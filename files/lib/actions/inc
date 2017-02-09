@@ -38,6 +38,18 @@ function perform_action() {
   echo $inc_backup_path >> $backup_directory/.digest
   echo "status=0" > $backup_directory/backup.status
   echo "Backup Completed OK!"
+  
+  if tail $logfile_f -n 1 | grep completed.OK
+  then
+    echo "Creating archive for S3.."
+    tar -czf /tmp/$(basename ${inc_backup_path}).tar.gz ${inc_backup_path}
+
+    echo "Copying archive to S3"
+    s3cmd put -e -f /tmp/$(basename ${inc_backup_path}).tar.gz s3://${s3bucket}$(dirname ${inc_backup_path})/
+
+    echo "Removing cached archive"
+    rm /tmp/$(basename ${inc_backup_path}).tar.gz
+  fi
 }
 
 # fin
