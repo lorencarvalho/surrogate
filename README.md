@@ -13,6 +13,7 @@ _Bring back life form. Priority One. All other priorities rescinded._
 - Percona 5.5+
 - Percona Xtrabackup 2.0.1 or later
 - Ample disk space (even with compression backups are only 2:1 ratio)
+- [S3tools](http://s3tools.org/s3cmd) installed and configured
 
 #### Usage
 
